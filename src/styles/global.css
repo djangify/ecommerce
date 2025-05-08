@@ -1,0 +1,19 @@
+@tailwind utilities;
+@import "tailwindcss";
+
+/* Custom base styles */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Custom components */
+@layer components {
+  /* Any custom component styles */
+}
+
+/* Custom utilities */
+@layer utilities {
+  /* Any custom utility classes */
+}
