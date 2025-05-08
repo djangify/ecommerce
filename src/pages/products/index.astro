@@ -1,0 +1,77 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { fetchProducts, fetchCategories } from "../../lib/api";
+
+const products = await fetchProducts();
+const categories = await fetchCategories();
+---
+
+<BaseLayout>
+  <Header slot="header" />
+
+  <div class="container mx-auto px-4 py-12">
+    <h1 class="text-4xl font-bold mb-8">All Products</h1>
+
+    <div class="flex flex-col md:flex-row">
+      <!-- Sidebar with filters -->
+      <div class="w-full md:w-1/4 pr-8 mb-8 md:mb-0">
+        <div class="bg-white p-4 rounded-lg shadow-md">
+          <h2 class="text-xl font-semibold mb-4">Categories</h2>
+          <ul class="space-y-2">
+            {
+              categories.map((category) => (
+                <li>
+                  <a
+                    href={`/products?category=${category.slug}`}
+                    class="text-blue-600 hover:underline"
+                  >
+                    {category.name}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="w-full md:w-3/4">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {
+            products.map((product) => (
+              <a
+                href={`/products/${product.slug}`}
+                class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+              >
+                {product.main_image && (
+                  <img
+                    src={product.main_image}
+                    alt={product.name}
+                    class="w-full h-48 object-cover"
+                  />
+                )}
+                <div class="p-4">
+                  <h3 class="text-lg font-semibold mb-2">{product.name}</h3>
+                  <div class="flex justify-between items-center">
+                    <span class="text-lg font-bold text-blue-600">
+                      ${product.current_price}
+                    </span>
+                    {product.is_on_sale && (
+                      <span class="text-sm line-through text-gray-500">
+                        ${product.price}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </a>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <Footer slot="footer" />
+</BaseLayout>

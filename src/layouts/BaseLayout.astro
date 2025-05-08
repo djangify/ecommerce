@@ -7,8 +7,8 @@ interface Props {
 }
 
 const {
-  title = "Corrison eCommerce",
-  description = "Your trusted partner for innovative eCommerce digital solutions",
+  title = "Todiane E-commerce",
+  description = "Shop our amazing products at great prices",
 } = Astro.props;
 ---
 
@@ -31,17 +31,6 @@ const {
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-
-    <!-- Open Graph / Social Media Meta Tags -->
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={Astro.url.href} />
-
-    <!-- Twitter Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
 
     <slot name="head" />
   </head>

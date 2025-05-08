@@ -1,0 +1,193 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { fetchProduct, fetchProducts } from "../../lib/api";
+import type { Product } from "../../types";
+
+export async function getStaticPaths() {
+  const products = await fetchProducts();
+
+  return products.map((product) => ({
+    params: { slug: product.slug },
+    props: { product },
+  }));
+}
+
+const { product } = Astro.props;
+---
+
+<BaseLayout>
+  <Header slot="header" />
+
+  <div class="container mx-auto px-4 py-12">
+    <div class="flex flex-col md:flex-row mb-12">
+      <!-- Product Images -->
+      <div class="w-full md:w-1/2 mb-8 md:mb-0">
+        <div class="bg-white p-4 rounded-lg shadow-md">
+          <img
+            src={product.main_image}
+            alt={product.name}
+            class="w-full h-auto rounded-lg"
+          />
+
+          {
+            product.images && product.images.length > 0 && (
+              <div class="grid grid-cols-4 gap-2 mt-4">
+                {product.images.map((image) => (
+                  <img
+                    src={image.image}
+                    alt={image.alt_text || product.name}
+                    class="w-full h-20 object-cover rounded-md cursor-pointer"
+                  />
+                ))}
+              </div>
+            )
+          }
+        </div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="w-full md:w-1/2 md:pl-8">
+        <h1 class="text-3xl font-bold mb-4">{product.name}</h1>
+
+        <div class="mb-4">
+          {
+            product.is_on_sale ? (
+              <div class="flex items-center">
+                <span class="text-2xl font-bold text-blue-600 mr-2">
+                  ${product.current_price}
+                </span>
+                <span class="text-lg line-through text-gray-500">
+                  ${product.price}
+                </span>
+                <span class="ml-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">
+                  SALE
+                </span>
+              </div>
+            ) : (
+              <span class="text-2xl font-bold text-blue-600">
+                ${product.price}
+              </span>
+            )
+          }
+        </div>
+
+        <div class="mb-6">
+          <span
+            class={`${product.in_stock ? "text-green-600" : "text-red-600"} font-medium`}
+          >
+            {product.in_stock ? "In Stock" : "Out of Stock"}
+          </span>
+        </div>
+
+        {
+          product.variants && product.variants.length > 0 && (
+            <div class="mb-6">
+              <label class="block text-gray-700 font-medium mb-2">
+                Options
+              </label>
+              <select class="w-full p-2 border border-gray-300 rounded-md">
+                {product.variants.map((variant) => (
+                  <option value={variant.id}>
+                    {variant.attributes.map((attr) => attr.value).join(" / ")} -
+                    ${variant.price}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )
+        }
+
+        <div class="mb-6">
+          <label class="block text-gray-700 font-medium mb-2"> Quantity </label>
+          <div class="flex items-center">
+            <button
+              class="bg-gray-200 px-3 py-1 rounded-l-md"
+              id="decrease-qty"
+            >
+              -
+            </button>
+            <input
+              type="number"
+              min="1"
+              value="1"
+              id="quantity"
+              class="w-16 text-center border-t border-b border-gray-300 py-1"
+            />
+            <button
+              class="bg-gray-200 px-3 py-1 rounded-r-md"
+              id="increase-qty"
+            >
+              +
+            </button>
+          </div>
+        </div>
+
+        <button
+          id="add-to-cart"
+          class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors mb-4"
+          data-product-id={product.id}
+        >
+          Add to Cart
+        </button>
+
+        <div class="prose max-w-none mt-8">
+          <h3 class="text-xl font-semibold mb-2">Description</h3>
+          <div set:html={product.description} />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <Footer slot="footer" />
+</BaseLayout>
+
+<script define:vars={{ productId: product.id }}>
+  // Quantity buttons
+  const decreaseBtn = document.getElementById("decrease-qty");
+  const increaseBtn = document.getElementById("increase-qty");
+  const quantityInput = document.getElementById("quantity");
+  const addToCartBtn = document.getElementById("add-to-cart");
+
+  decreaseBtn.addEventListener("click", () => {
+    const currentValue = parseInt(quantityInput.value);
+    if (currentValue > 1) {
+      quantityInput.value = currentValue - 1;
+    }
+  });
+
+  increaseBtn.addEventListener("click", () => {
+    const currentValue = parseInt(quantityInput.value);
+    quantityInput.value = currentValue + 1;
+  });
+
+  addToCartBtn.addEventListener("click", async () => {
+    const quantity = parseInt(quantityInput.value);
+    const variantSelect = document.querySelector("select");
+    const variantId = variantSelect ? variantSelect.value : null;
+
+    try {
+      const response = await fetch(`/api/cart/add`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          productId,
+          variantId,
+          quantity,
+        }),
+      });
+
+      if (response.ok) {
+        alert("Product added to cart!");
+      } else {
+        alert("Failed to add product to cart");
+      }
+    } catch (error) {
+      console.error("Error adding to cart:", error);
+      alert("An error occurred. Please try again.");
+    }
+  });
+</script>
