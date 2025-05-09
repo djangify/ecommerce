@@ -1,8 +1,10 @@
-// src/lib/api.ts - Updated implementation with TypeScript fixes
 import type { Product, Category, Cart, CartItem } from "../types";
 
-// Default base URL - adjust this to point to your Django backend
-const API_BASE = import.meta.env.PUBLIC_API_BASE_URL || 'http://localhost:8000';
+// Base URL for API
+const isDevelopment = import.meta.env.DEV;
+const API_BASE = isDevelopment
+  ? 'http://localhost:8000'
+  : (import.meta.env.PUBLIC_API_BASE_URL || 'https://corrison.djangify.com');
 
 /**
  * Helper function to check API responses
@@ -16,132 +18,90 @@ async function check<T>(res: Response, what: string): Promise<T> {
   return res.json();
 }
 
-/**
- * Mock data for development when API is not available
- */
-const MOCK_MODE = false; // Set to true during development if API is unavailable
-
-const MOCK_PRODUCTS: Product[] = [
-  {
-    id: '1',
-    name: 'Sample Product',
-    slug: 'sample-product',
-    description: 'This is a sample product description.',
-    price: 29.99,
-    sale_price: null,
-    current_price: 29.99,
-    is_on_sale: false,
-    is_featured: true,
-    in_stock: true,
-    stock_qty: 10,
-    sku: 'PROD001',
-    main_image: '/api/placeholder/400/320',
-    images: [],
-    variants: [],
-    category: {
-      id: '1',
-      name: 'Sample Category',
-      slug: 'sample-category',
-      description: 'Sample category description',
-      image: null
-    }
-  }
-];
-
-const MOCK_CATEGORIES: Category[] = [
-  {
-    id: '1',
-    name: 'Sample Category',
-    slug: 'sample-category',
-    description: 'Sample category description',
-    image: null
-  }
-];
-
-const MOCK_CART: Cart = {
-  id: '1',
-  items: [{
-    id: '1',
-    product: MOCK_PRODUCTS[0],
-    variant: null,
-    quantity: 1,
-    unit_price: 29.99,
-    total_price: 29.99
-  }],
-  subtotal: 29.99,
-  total_items: 1,
-  created_at: new Date().toISOString()
-};
-
 /** Products */
 export async function fetchProducts(): Promise<Product[]> {
-  if (MOCK_MODE) return MOCK_PRODUCTS;
-
   try {
-    return fetch(`${API_BASE}/api/v1/products/`)
-      .then(r => check<Product[]>(r, "products"));
+    const response = await fetch(`${API_BASE}/api/v1/products/`);
+
+    if (!response.ok) {
+      console.warn(`Products fetch failed with status: ${response.status}`);
+      // Return an empty products array instead of throwing an error
+      return [];
+    }
+
+    return await response.json();
   } catch (error) {
     console.error('Error fetching products:', error);
-    return MOCK_PRODUCTS;
+    // Return empty array on error
+    return [];
   }
 }
 
 export async function fetchProduct(slug: string): Promise<Product> {
-  if (MOCK_MODE) return MOCK_PRODUCTS[0];
-
   try {
     return fetch(`${API_BASE}/api/v1/products/${slug}/`)
       .then(r => check<Product>(r, "product"));
   } catch (error) {
     console.error(`Error fetching product ${slug}:`, error);
-    return MOCK_PRODUCTS[0];
+    throw error;
   }
 }
 
 /** Categories */
 export async function fetchCategories(): Promise<Category[]> {
-  if (MOCK_MODE) return MOCK_CATEGORIES;
-
   try {
-    return fetch(`${API_BASE}/api/v1/categories/`)
-      .then(r => check<Category[]>(r, "categories"));
+    const response = await fetch(`${API_BASE}/api/v1/categories/`);
+
+    if (!response.ok) {
+      console.warn(`Categories fetch failed with status: ${response.status}`);
+      // Return an empty categories array instead of throwing an error
+      return [];
+    }
+
+    return await response.json();
   } catch (error) {
     console.error('Error fetching categories:', error);
-    return MOCK_CATEGORIES;
-  }
-}
-
-export async function fetchCategory(slug: string): Promise<Category> {
-  if (MOCK_MODE) return MOCK_CATEGORIES[0];
-
-  try {
-    return fetch(`${API_BASE}/api/v1/categories/${slug}/`)
-      .then(r => check<Category>(r, "category"));
-  } catch (error) {
-    console.error(`Error fetching category ${slug}:`, error);
-    return MOCK_CATEGORIES[0];
+    // Return empty array on error
+    return [];
   }
 }
 
 /** Cart */
 export async function fetchCart(): Promise<Cart> {
-  if (MOCK_MODE) return MOCK_CART;
-
   try {
-    return fetch(`${API_BASE}/api/v1/cart/`, {
+    const response = await fetch(`${API_BASE}/api/v1/cart/`, {
       credentials: 'include', // Include cookies for session-based carts
-    }).then(r => check<Cart>(r, "cart"));
+    });
+
+    if (!response.ok) {
+      console.warn(`Cart fetch failed with status: ${response.status}`);
+      // Return an empty cart instead of throwing an error
+      return {
+        id: "temp-cart",
+        items: [],
+        subtotal: 0,
+        total_items: 0,
+        created_at: new Date().toISOString()
+      };
+    }
+
+    return await response.json();
   } catch (error) {
     console.error('Error fetching cart:', error);
-    return MOCK_CART;
+    // Return empty cart on error for graceful degradation
+    return {
+      id: "temp-cart",
+      items: [],
+      subtotal: 0,
+      total_items: 0,
+      created_at: new Date().toISOString()
+    };
   }
 }
 
 export async function addToCart(productId: string, variantId?: string, quantity: number = 1): Promise<CartItem> {
-  if (MOCK_MODE) return MOCK_CART.items[0];
-
   try {
-    return fetch(`${API_BASE}/api/v1/cart/items/`, {
+    return fetch(`${API_BASE}/api/v1/items/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -160,8 +120,6 @@ export async function addToCart(productId: string, variantId?: string, quantity:
 }
 
 export async function updateCartItem(itemId: string, quantity: number): Promise<CartItem> {
-  if (MOCK_MODE) return MOCK_CART.items[0];
-
   try {
     return fetch(`${API_BASE}/api/v1/cart/items/${itemId}/`, {
       method: 'PUT',
@@ -180,8 +138,6 @@ export async function updateCartItem(itemId: string, quantity: number): Promise<
 }
 
 export async function removeCartItem(itemId: string): Promise<void> {
-  if (MOCK_MODE) return;
-
   try {
     return fetch(`${API_BASE}/api/v1/cart/items/${itemId}/`, {
       method: 'DELETE',
