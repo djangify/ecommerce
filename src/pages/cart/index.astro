@@ -1,13 +1,28 @@
 ---
+// src/pages/cart/index.astro 
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { fetchCart } from "../../lib/api";
 
-const cart = await fetchCart();
+// Wrap in try/catch to handle API failures gracefully
+let cart;
+try {
+  cart = await fetchCart();
+} catch (error) {
+  console.error("Error fetching cart:", error);
+  // Provide a fallback empty cart
+  cart = {
+    id: "0",
+    items: [],
+    subtotal: 0,
+    total_items: 0,
+    created_at: new Date().toISOString()
+  };
+}
 ---
 
-<BaseLayout>
+<BaseLayout title="Your Cart | Todiane Shop">
   <Header slot="header" />
 
   <div class="container mx-auto px-4 py-12">
@@ -72,7 +87,7 @@ const cart = await fetchCart();
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center">
                         <div class="h-16 w-16 flex-shrink-0">
-                          <img class="h-16 w-16 object-cover" src={item.product.main_image} alt={item.product.name} />
+                          <img class="h-16 w-16 object-cover" src={item.product.main_image || '/api/placeholder/400/320'} alt={item.product.name} />
                         </div>
                         <div class="ml-4">
                           <div class="text-sm font-medium text-gray-900">
@@ -173,7 +188,6 @@ const cart = await fetchCart();
 
   <Footer slot="footer" />
 </BaseLayout>
-
 <script>
   // Handle cart updates
   document.addEventListener('DOMContentLoaded', () => {

@@ -1,16 +1,14 @@
-// src/pages/api/cart/add.ts
+// src/pages/api/cart/update.ts
 import type { APIRoute } from 'astro';
-import { addToCart } from '../../../lib/api';
+import { updateCartItem } from '../../../lib/api';
 
-// Handle POST requests for adding items to cart
-export const post: APIRoute = async ({ request }) => {
+export const put: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
-    const { productId, variantId, quantity } = data;
+    const { itemId, quantity } = data;
 
-    // Validate required fields
-    if (!productId) {
-      return new Response(JSON.stringify({ error: 'Product ID is required' }), {
+    if (!itemId || !quantity) {
+      return new Response(JSON.stringify({ error: 'Item ID and quantity are required' }), {
         status: 400,
         headers: {
           'Content-Type': 'application/json'
@@ -18,7 +16,7 @@ export const post: APIRoute = async ({ request }) => {
       });
     }
 
-    const result = await addToCart(productId, variantId, quantity);
+    const result = await updateCartItem(itemId, quantity);
 
     return new Response(JSON.stringify(result), {
       status: 200,
@@ -39,11 +37,11 @@ export const post: APIRoute = async ({ request }) => {
 
 // Add GET handler to prevent routing errors
 export const get: APIRoute = async () => {
-  return new Response(JSON.stringify({ error: "Use POST method to add items to cart" }), {
+  return new Response(JSON.stringify({ error: "Use PUT method to update cart items" }), {
     status: 405,
     headers: {
       'Content-Type': 'application/json',
-      'Allow': 'POST'
+      'Allow': 'PUT'
     }
   });
 };

@@ -1,16 +1,14 @@
-// src/pages/api/cart/add.ts
+// src/pages/api/cart/remove.ts
 import type { APIRoute } from 'astro';
-import { addToCart } from '../../../lib/api';
+import { removeCartItem } from '../../../lib/api';
 
-// Handle POST requests for adding items to cart
-export const post: APIRoute = async ({ request }) => {
+export const del: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
-    const { productId, variantId, quantity } = data;
+    const { itemId } = data;
 
-    // Validate required fields
-    if (!productId) {
-      return new Response(JSON.stringify({ error: 'Product ID is required' }), {
+    if (!itemId) {
+      return new Response(JSON.stringify({ error: 'Item ID is required' }), {
         status: 400,
         headers: {
           'Content-Type': 'application/json'
@@ -18,9 +16,9 @@ export const post: APIRoute = async ({ request }) => {
       });
     }
 
-    const result = await addToCart(productId, variantId, quantity);
+    await removeCartItem(itemId);
 
-    return new Response(JSON.stringify(result), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: {
         'Content-Type': 'application/json'
@@ -39,11 +37,11 @@ export const post: APIRoute = async ({ request }) => {
 
 // Add GET handler to prevent routing errors
 export const get: APIRoute = async () => {
-  return new Response(JSON.stringify({ error: "Use POST method to add items to cart" }), {
+  return new Response(JSON.stringify({ error: "Use DELETE method to remove cart items" }), {
     status: 405,
     headers: {
       'Content-Type': 'application/json',
-      'Allow': 'POST'
+      'Allow': 'DELETE'
     }
   });
 };
