@@ -36,7 +36,7 @@ export const put: APIRoute = async ({ request }) => {
 };
 
 // Add GET handler to prevent routing errors
-export const get: APIRoute = async () => {
+export const GET: APIRoute = async () => {
   return new Response(JSON.stringify({ error: "Use PUT method to update cart items" }), {
     status: 405,
     headers: {

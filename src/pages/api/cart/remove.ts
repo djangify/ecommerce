@@ -36,7 +36,7 @@ export const del: APIRoute = async ({ request }) => {
 };
 
 // Add GET handler to prevent routing errors
-export const get: APIRoute = async () => {
+export const GET: APIRoute = async () => {
   return new Response(JSON.stringify({ error: "Use DELETE method to remove cart items" }), {
     status: 405,
     headers: {

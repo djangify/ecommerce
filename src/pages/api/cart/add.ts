@@ -3,7 +3,7 @@ import type { APIRoute } from 'astro';
 import { addToCart } from '../../../lib/api';
 
 // Handle POST requests for adding items to cart
-export const post: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
     const { productId, variantId, quantity } = data;
@@ -38,7 +38,7 @@ export const post: APIRoute = async ({ request }) => {
 };
 
 // Add GET handler to prevent routing errors
-export const get: APIRoute = async () => {
+export const GET: APIRoute = async () => {
   return new Response(JSON.stringify({ error: "Use POST method to add items to cart" }), {
     status: 405,
     headers: {

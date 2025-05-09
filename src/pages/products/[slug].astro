@@ -54,16 +54,16 @@ export async function getStaticPaths() {
   }));
 }
 
-const { product, isError } = Astro.props;
+const { product = {}, isError = false } = Astro.props;
 
 // Fetch the full product data for more details if this is a dynamic route
 let fullProduct = product;
-if (!isError && Astro.request.url.includes(product.slug)) {
+if (!isError && product?.slug && Astro.request.url.includes(product.slug)) {
   try {
     fullProduct = await fetchProduct(product.slug);
   } catch (error) {
     console.error(
-      `Error fetching full product data for ${product.slug}:`,
+      `Error fetching full product data for ${product?.slug || "unknown"}:`,
       error,
     );
     // We'll continue with the basic product data we already have
@@ -71,7 +71,7 @@ if (!isError && Astro.request.url.includes(product.slug)) {
 }
 ---
 
-<BaseLayout title={`${product.name} | Todiane Shop`}>
+<BaseLayout title={`${product?.name || "Product"} | Todiane Shop`}>
   <Header slot="header" />
 
   <div class="container mx-auto px-4 py-12">
@@ -221,7 +221,7 @@ if (!isError && Astro.request.url.includes(product.slug)) {
   <Footer slot="footer" />
 </BaseLayout>
 
-<script define:vars={{ productId: product.id }}>
+<script define:vars={{ productId: product?.id || "" }}>
   // Quantity buttons
   const decreaseBtn = document.getElementById("decrease-qty");
   const increaseBtn = document.getElementById("increase-qty");
