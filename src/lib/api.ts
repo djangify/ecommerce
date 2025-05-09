@@ -19,7 +19,7 @@ async function check<T>(res: Response, what: string): Promise<T> {
 /**
  * Mock data for development when API is not available
  */
-const MOCK_MODE = true; // Set to true during development if API is unavailable
+const MOCK_MODE = false; // Set to true during development if API is unavailable
 
 const MOCK_PRODUCTS: Product[] = [
   {
