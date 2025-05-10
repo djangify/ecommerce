@@ -2,7 +2,7 @@
 import type { APIRoute } from 'astro';
 import { updateCartItem } from '../../../lib/api';
 
-export const put: APIRoute = async ({ request }) => {
+export const PUT: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
     const { itemId, quantity } = data;

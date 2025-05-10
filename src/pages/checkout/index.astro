@@ -242,7 +242,7 @@ const stripePublicKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY;
     async function initialize() {
       try {
         // Create a payment intent on the server
-        const response = await fetch("/api/create-payment-intent", {
+        const response = await fetch("/api/v1/create-payment-intent", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ 
@@ -287,7 +287,7 @@ const stripePublicKey = import.meta.env.PUBLIC_STRIPE_PUBLISHABLE_KEY;
       
       try {
         // Save order details first
-        const orderResponse = await fetch("/api/create-order", {
+        const orderResponse = await fetch("/api/v1/create-order", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),

@@ -2,7 +2,7 @@
 import type { APIRoute } from 'astro';
 import { removeCartItem } from '../../../lib/api';
 
-export const del: APIRoute = async ({ request }) => {
+export const DELETE: APIRoute = async ({ request }) => {
   try {
     const data = await request.json();
     const { itemId } = data;

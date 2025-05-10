@@ -87,7 +87,7 @@ try {
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center">
                         <div class="h-16 w-16 flex-shrink-0">
-                          <img class="h-16 w-16 object-cover" src={item.product.main_image || '/api/placeholder/400/320'} alt={item.product.name} />
+                          <img class="h-16 w-16 object-cover" src={item.product.main_image || "/images/no-image.svg"} alt={item.product.name} />
                         </div>
                         <div class="ml-4">
                           <div class="text-sm font-medium text-gray-900">
@@ -263,7 +263,7 @@ try {
     
     // Function to update cart item
     async function updateCartItem(itemId: string, quantity: number) {
-      const response = await fetch(`/api/cart/update`, {
+      const response = await fetch(`/api/v1/cart/update`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -280,7 +280,7 @@ try {
     
     // Function to remove cart item
     async function removeCartItem(itemId: string) {
-      const response = await fetch(`/api/cart/remove`, {
+      const response = await fetch(`/api/v1/cart/remove`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',

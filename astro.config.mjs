@@ -10,6 +10,9 @@ export default defineConfig({
     port: 3000,
     host: true
   },
+  adapter: node({
+    mode: 'standalone',
+  }),
   build: {
     site: 'https://ecommerce.todiane.com',
     base: '/',

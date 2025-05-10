@@ -31,7 +31,7 @@ export async function getStaticPaths() {
             in_stock: true,
             stock_qty: 10,
             sku: "SAMPLE001",
-            main_image: "/api/placeholder/400/320",
+            main_image: "/images/no-image.svg",
             images: [],
             variants: [],
             category: {
@@ -54,16 +54,21 @@ export async function getStaticPaths() {
   }));
 }
 
-const { product = {}, isError = false } = Astro.props;
+const { product, isError } = Astro.props;
 
 // Fetch the full product data for more details if this is a dynamic route
 let fullProduct = product;
-if (!isError && product?.slug && Astro.request.url.includes(product.slug)) {
+if (
+  !isError &&
+  product &&
+  product.slug &&
+  Astro.request.url.includes(product.slug)
+) {
   try {
     fullProduct = await fetchProduct(product.slug);
   } catch (error) {
     console.error(
-      `Error fetching full product data for ${product?.slug || "unknown"}:`,
+      `Error fetching full product data for ${product.slug}:`,
       error,
     );
     // We'll continue with the basic product data we already have
@@ -91,37 +96,54 @@ if (!isError && product?.slug && Astro.request.url.includes(product.slug)) {
       <div class="w-full md:w-1/2 mb-8 md:mb-0">
         <div class="bg-white p-4 rounded-lg shadow-md">
           <img
-            src={fullProduct.main_image || "/api/placeholder/400/320"}
-            alt={fullProduct.name}
+            src={fullProduct?.main_image || "/images/no-image.svg"}
+            alt={fullProduct?.name || "Product"}
             class="w-full h-auto rounded-lg"
           />
 
+          <!-- Always show main image as first gallery image if no gallery images exist -->
           {
-            fullProduct.images && fullProduct.images.length > 0 && (
+            fullProduct?.images && fullProduct.images.length > 0 && (
               <div class="grid grid-cols-4 gap-2 mt-4">
                 {fullProduct.images.map((image) => (
                   <img
-                    src={image.image || "/api/placeholder/100/100"}
-                    alt={image.alt_text || fullProduct.name}
+                    src={image.image || "/images/no-image.svg"}
+                    alt={image.alt_text || fullProduct.name || "Product"}
                     class="w-full h-20 object-cover rounded-md cursor-pointer"
                   />
                 ))}
               </div>
             )
           }
+
+          <!-- If no gallery images, show main image as gallery -->
+          {
+            (!fullProduct?.images || fullProduct.images.length === 0) &&
+              fullProduct?.main_image && (
+                <div class="grid grid-cols-4 gap-2 mt-4">
+                  <img
+                    src={fullProduct.main_image}
+                    alt={fullProduct.name || "Product"}
+                    class="w-full h-20 object-cover rounded-md cursor-pointer"
+                  />
+                </div>
+              )
+          }
         </div>
       </div>
 
       <!-- Product Info -->
       <div class="w-full md:w-1/2 md:pl-8">
-        <h1 class="text-3xl font-bold mb-4">{fullProduct.name}</h1>
+        <h1 class="text-3xl font-bold mb-4">
+          {fullProduct?.name || "Product"}
+        </h1>
 
         <div class="mb-4">
           {
-            fullProduct.is_on_sale ? (
+            fullProduct?.is_on_sale ? (
               <div class="flex items-center">
                 <span class="text-2xl font-bold text-blue-600 mr-2">
-                  ${fullProduct.current_price}
+                  ${fullProduct.current_price || fullProduct.sale_price}
                 </span>
                 <span class="text-lg line-through text-gray-500">
                   ${fullProduct.price}
@@ -132,7 +154,7 @@ if (!isError && product?.slug && Astro.request.url.includes(product.slug)) {
               </div>
             ) : (
               <span class="text-2xl font-bold text-blue-600">
-                ${fullProduct.price}
+                ${fullProduct?.price || 0}
               </span>
             )
           }
@@ -140,12 +162,12 @@ if (!isError && product?.slug && Astro.request.url.includes(product.slug)) {
 
         <div class="mb-6">
           <span
-            class={`${fullProduct.in_stock ? "text-green-600" : "text-red-600"} font-medium`}
+            class={`${fullProduct?.in_stock ? "text-green-600" : "text-red-600"} font-medium`}
           >
-            {fullProduct.in_stock ? "In Stock" : "Out of Stock"}
+            {fullProduct?.in_stock ? "In Stock" : "Out of Stock"}
           </span>
           {
-            fullProduct.in_stock && (
+            fullProduct?.in_stock && (
               <span class="text-gray-600 ml-2">
                 ({fullProduct.stock_qty} available)
               </span>
@@ -154,7 +176,7 @@ if (!isError && product?.slug && Astro.request.url.includes(product.slug)) {
         </div>
 
         {
-          fullProduct.variants && fullProduct.variants.length > 0 && (
+          fullProduct?.variants && fullProduct.variants.length > 0 && (
             <div class="mb-6">
               <label class="block text-gray-700 font-medium mb-2">
                 Options
@@ -205,14 +227,14 @@ if (!isError && product?.slug && Astro.request.url.includes(product.slug)) {
         <button
           id="add-to-cart"
           class="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors mb-4"
-          data-product-id={fullProduct.id}
+          data-product-id={fullProduct?.id || ""}
         >
           Add to Cart
         </button>
 
         <div class="prose max-w-none mt-8">
           <h3 class="text-xl font-semibold mb-2">Description</h3>
-          <div set:html={fullProduct.description} />
+          <div set:html={fullProduct?.description || ""} />
         </div>
       </div>
     </div>
@@ -249,7 +271,7 @@ if (!isError && product?.slug && Astro.request.url.includes(product.slug)) {
       const variantId = variantSelect ? variantSelect.value : null;
 
       try {
-        const response = await fetch(`/api/cart/add`, {
+        const response = await fetch(`/api/v1/cart/add`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
