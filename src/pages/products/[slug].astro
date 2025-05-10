@@ -1,78 +1,32 @@
 ---
-// src/pages/products/[slug].astro - Fixed implementation
+// src/pages/products/[slug].astro - Dynamic implementation
+export const prerender = false;
+
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { fetchProduct, fetchProducts } from "../../lib/api";
 import type { Product } from "../../types";
 
-// Add error handling for static paths generation
-export async function getStaticPaths() {
-  let products = [];
-  try {
-    products = await fetchProducts();
-  } catch (error) {
-    console.error("Error fetching products for static paths:", error);
-    // Return at least one path to prevent build failures
-    return [
-      {
-        params: { slug: "sample-product" },
-        props: {
-          product: {
-            id: "sample",
-            name: "Sample Product",
-            slug: "sample-product",
-            description: "This is a sample product description.",
-            price: 29.99,
-            sale_price: null,
-            current_price: 29.99,
-            is_on_sale: false,
-            is_featured: true,
-            in_stock: true,
-            stock_qty: 10,
-            sku: "SAMPLE001",
-            main_image: "/images/no-image.svg",
-            images: [],
-            variants: [],
-            category: {
-              id: "1",
-              name: "Sample Category",
-              slug: "sample-category",
-              description: null,
-              image: null,
-            },
-          },
-          isError: true,
-        },
-      },
-    ];
+// Get slug from URL
+
+const { slug } = Astro.params;
+
+// Fetch product data directly
+let product = null;
+let isError = false;
+let fullProduct = null;
+
+try {
+  if (typeof slug === "string") {
+    fullProduct = await fetchProduct(slug);
+  } else {
+    throw new Error("Invalid slug: must be a string.");
   }
-
-  return products.map((product) => ({
-    params: { slug: product.slug },
-    props: { product, isError: false },
-  }));
-}
-
-const { product, isError } = Astro.props;
-
-// Fetch the full product data for more details if this is a dynamic route
-let fullProduct = product;
-if (
-  !isError &&
-  product &&
-  product.slug &&
-  Astro.request.url.includes(product.slug)
-) {
-  try {
-    fullProduct = await fetchProduct(product.slug);
-  } catch (error) {
-    console.error(
-      `Error fetching full product data for ${product.slug}:`,
-      error,
-    );
-    // We'll continue with the basic product data we already have
-  }
+  product = fullProduct;
+} catch (error) {
+  console.error("Error fetching product:", error);
+  isError = true;
 }
 ---
 
@@ -96,7 +50,7 @@ if (
       <div class="w-full md:w-1/2 mb-8 md:mb-0">
         <div class="bg-white p-4 rounded-lg shadow-md">
           <img
-            src={fullProduct?.main_image || "/images/no-image.svg"}
+            src={fullProduct?.main_image}
             alt={fullProduct?.name || "Product"}
             class="w-full h-auto rounded-lg"
           />
@@ -107,7 +61,7 @@ if (
               <div class="grid grid-cols-4 gap-2 mt-4">
                 {fullProduct.images.map((image) => (
                   <img
-                    src={image.image || "/images/no-image.svg"}
+                    src={image.image}
                     alt={image.alt_text || fullProduct.name || "Product"}
                     class="w-full h-20 object-cover rounded-md cursor-pointer"
                   />
@@ -154,7 +108,7 @@ if (
               </div>
             ) : (
               <span class="text-2xl font-bold text-blue-600">
-                ${fullProduct?.price || 0}
+                ${fullProduct?.current_price || fullProduct?.price || 0}
               </span>
             )
           }
@@ -234,7 +188,7 @@ if (
 
         <div class="prose max-w-none mt-8">
           <h3 class="text-xl font-semibold mb-2">Description</h3>
-          <div set:html={fullProduct?.description || ""} />
+          {fullProduct?.description || "No description available."}
         </div>
       </div>
     </div>
@@ -271,7 +225,7 @@ if (
       const variantId = variantSelect ? variantSelect.value : null;
 
       try {
-        const response = await fetch(`/api/v1/cart/add`, {
+        const response = await fetch(`http://localhost:8000/api/v1/cart/add/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

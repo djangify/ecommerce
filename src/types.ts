@@ -1,21 +1,21 @@
 // Product types
 export interface Product {
-  id: string;
+  id: number;
   name: string;
   slug: string;
-  description: string;
-  price: number;
-  sale_price: number | null;
-  current_price: number;
+  sku: string;
+  category: Category;
+  description: string | null;
+  price: string;              // Changed from number to string
+  sale_price: string | null;  // Changed from number | null to string | null
+  current_price: string;      // Changed from number to string
   is_on_sale: boolean;
   is_featured: boolean;
   in_stock: boolean;
   stock_qty: number;
-  sku: string;
-  main_image: string;
+  main_image: string | null;  // Changed from string to string | null (API shows null values)
   images: ProductImage[];
   variants: ProductVariant[];
-  category: Category;
 }
 
 export interface ProductImage {
@@ -35,8 +35,8 @@ export interface AttributeValue {
 export interface ProductVariant {
   id: string;
   sku: string;
-  price: number;
-  sale_price: number | null;
+  price: string;              // Changed from number to string
+  sale_price: string | null;  // Changed from number | null to string | null
   stock_qty: number;
   is_active: boolean;
   attributes: AttributeValue[];
@@ -44,7 +44,7 @@ export interface ProductVariant {
 
 // Category type
 export interface Category {
-  id: string;
+  id: number;                 // Changed from string to number (API returns number)
   name: string;
   slug: string;
   description: string | null;

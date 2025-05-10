@@ -1,10 +1,7 @@
 import type { Product, Category, Cart, CartItem } from "../types";
 
-// Base URL for API
-const isDevelopment = import.meta.env.DEV;
-const API_BASE = isDevelopment
-  ? 'http://localhost:8000'
-  : (import.meta.env.PUBLIC_API_BASE_URL || 'https://corrison.djangify.com');
+// Hardcode the API URL for local development
+const API = 'http://localhost:8000';
 
 /**
  * Helper function to check API responses
@@ -21,25 +18,23 @@ async function check<T>(res: Response, what: string): Promise<T> {
 /** Products */
 export async function fetchProducts(): Promise<Product[]> {
   try {
-    const response = await fetch(`${API_BASE}/api/v1/products/`);
+    const response = await fetch(`${API}/api/v1/products/`);
 
     if (!response.ok) {
       console.warn(`Products fetch failed with status: ${response.status}`);
-      // Return an empty products array instead of throwing an error
       return [];
     }
 
     return await response.json();
   } catch (error) {
     console.error('Error fetching products:', error);
-    // Return empty array on error
     return [];
   }
 }
 
 export async function fetchProduct(slug: string): Promise<Product> {
   try {
-    return fetch(`${API_BASE}/api/v1/products/${slug}/`)
+    return fetch(`${API}/api/v1/products/${slug}/`)
       .then(r => check<Product>(r, "product"));
   } catch (error) {
     console.error(`Error fetching product ${slug}:`, error);
@@ -50,7 +45,7 @@ export async function fetchProduct(slug: string): Promise<Product> {
 /** Categories */
 export async function fetchCategories(): Promise<Category[]> {
   try {
-    const response = await fetch(`${API_BASE}/api/v1/categories/`);
+    const response = await fetch(`${API}/api/v1/categories/`);
 
     if (!response.ok) {
       console.warn(`Categories fetch failed with status: ${response.status}`);
@@ -69,7 +64,7 @@ export async function fetchCategories(): Promise<Category[]> {
 /** Cart */
 export async function fetchCart(): Promise<Cart> {
   try {
-    const response = await fetch(`${API_BASE}/api/v1/cart/`, {
+    const response = await fetch(`${API}/api/v1/cart/`, {
       credentials: 'include', // Include cookies for session-based carts
     });
 
@@ -101,14 +96,14 @@ export async function fetchCart(): Promise<Cart> {
 
 export async function addToCart(productId: string, variantId?: string, quantity: number = 1): Promise<CartItem> {
   try {
-    return fetch(`${API_BASE}/api/v1/items/`, {
+    return fetch(`${API}/api/v1/items/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // Include cookies for session-based carts
+      credentials: 'include',
       body: JSON.stringify({
-        product: productId,
+        product: productId,  // Keep as is, this is correct
         variant: variantId,
         quantity: quantity
       }),
@@ -121,7 +116,7 @@ export async function addToCart(productId: string, variantId?: string, quantity:
 
 export async function updateCartItem(itemId: string, quantity: number): Promise<CartItem> {
   try {
-    return fetch(`${API_BASE}/api/v1/cart/items/${itemId}/`, {
+    return fetch(`${API}/api/v1/cart/items/${itemId}/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -139,7 +134,7 @@ export async function updateCartItem(itemId: string, quantity: number): Promise<
 
 export async function removeCartItem(itemId: string): Promise<void> {
   try {
-    return fetch(`${API_BASE}/api/v1/cart/items/${itemId}/`, {
+    return fetch(`${API}/api/v1/cart/items/${itemId}/`, {
       method: 'DELETE',
       credentials: 'include',
     }).then(r => {

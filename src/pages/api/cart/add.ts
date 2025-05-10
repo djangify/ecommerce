@@ -18,6 +18,7 @@ export const POST: APIRoute = async ({ request }) => {
       });
     }
 
+    // Convert productId to the format expected by backend (product field)
     const result = await addToCart(productId, variantId, quantity);
 
     return new Response(JSON.stringify(result), {
