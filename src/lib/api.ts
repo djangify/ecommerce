@@ -64,13 +64,16 @@ export async function fetchCategories(): Promise<Category[]> {
 /** Cart */
 export async function fetchCart(): Promise<Cart> {
   try {
+    console.log('Fetching cart from:', `${API}/api/v1/cart/`);
     const response = await fetch(`${API}/api/v1/cart/`, {
       credentials: 'include', // Include cookies for session-based carts
     });
 
+    console.log('Cart response status:', response.status);
+    console.log('Cart response ok:', response.ok);
+
     if (!response.ok) {
       console.warn(`Cart fetch failed with status: ${response.status}`);
-      // Return an empty cart instead of throwing an error
       return {
         id: "temp-cart",
         items: [],
@@ -80,10 +83,12 @@ export async function fetchCart(): Promise<Cart> {
       };
     }
 
-    return await response.json();
+    const cartData = await response.json();
+    console.log('Cart data received:', cartData);
+    console.log('Cart items:', cartData.items);
+    return cartData;
   } catch (error) {
     console.error('Error fetching cart:', error);
-    // Return empty cart on error for graceful degradation
     return {
       id: "temp-cart",
       items: [],
@@ -94,6 +99,8 @@ export async function fetchCart(): Promise<Cart> {
   }
 }
 
+// src/lib/api.ts - Update these cart functions to match Django backend
+
 export async function addToCart(productId: string, variantId?: string, quantity: number = 1): Promise<CartItem> {
   try {
     return fetch(`${API}/api/v1/items/`, {
@@ -103,7 +110,7 @@ export async function addToCart(productId: string, variantId?: string, quantity:
       },
       credentials: 'include',
       body: JSON.stringify({
-        product: productId,  // Keep as is, this is correct
+        product: productId,
         variant: variantId,
         quantity: quantity
       }),
@@ -116,7 +123,7 @@ export async function addToCart(productId: string, variantId?: string, quantity:
 
 export async function updateCartItem(itemId: string, quantity: number): Promise<CartItem> {
   try {
-    return fetch(`${API}/api/v1/cart/items/${itemId}/`, {
+    return fetch(`${API}/api/v1/items/${itemId}/`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -134,7 +141,7 @@ export async function updateCartItem(itemId: string, quantity: number): Promise<
 
 export async function removeCartItem(itemId: string): Promise<void> {
   try {
-    return fetch(`${API}/api/v1/cart/items/${itemId}/`, {
+    return fetch(`${API}/api/v1/items/${itemId}/`, {
       method: 'DELETE',
       credentials: 'include',
     }).then(r => {
