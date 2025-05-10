@@ -4,27 +4,35 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { fetchCart } from "../../lib/api";
+const getDefaultCart = () => ({
+  id: "0",
+  items: [],
+  subtotal: 0,
+  total_items: 0,
+  created_at: new Date().toISOString()
+});
+
 // Wrap in try/catch to handle API failures gracefully
 let cart;
 try {
-  console.log("=== CART PAGE: About to fetch cart ===");
   cart = await fetchCart();
-  console.log("=== CART PAGE: Cart fetched ===");
-  alert("Cart page is loading!");
-  console.log("Cart ID on cart page:", cart?.id);
-  console.log("Cart items count:", cart?.items?.length);
-  console.log("Full cart object:", cart);
 } catch (error) {
-  console.error("Error fetching cart:", error);
-  // Provide a fallback empty cart
-  cart = {
-    id: "0",
-    items: [],
-    subtotal: 0,
-    total_items: 0,
-    created_at: new Date().toISOString()
-  };
+  cart = getDefaultCart();
 }
+
+// Ensure cart is properly structured
+if (!cart) {
+  cart = getDefaultCart();
+}
+
+// Type-safe cart with defaults
+const safeCart = {
+  id: cart.id || "0",
+  items: Array.isArray(cart.items) ? cart.items : [],
+  subtotal: cart.subtotal || 0,
+  total_items: cart.total_items || 0,
+  created_at: cart.created_at || new Date().toISOString()
+};
 ---
 
 <BaseLayout title="Your Cart | Todiane Shop">
@@ -33,7 +41,7 @@ try {
   <div class="container mx-auto px-4 py-12">
     <h1 class="text-4xl font-bold mb-8">Your Cart</h1>
 
-    {cart.items.length === 0 ? (
+    {safeCart.items.length === 0 ? (
       <div class="bg-white p-8 rounded-lg shadow-md text-center">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -87,61 +95,65 @@ try {
                 </tr>
               </thead>
               <tbody class="bg-white divide-y divide-gray-200">
-                {cart.items.map((item) => (
+                {safeCart.items.map((item: any) => (
                   <tr>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center">
                         <div class="h-16 w-16 flex-shrink-0">
-                          <img class="h-16 w-16 object-cover" src={item.product.main_image} alt={item.product.name} />
+                          <img 
+                            class="h-16 w-16 object-cover" 
+                            src={item?.product?.main_image || '/images/no-image.svg'} 
+                            alt={item?.product?.name || 'Product'} 
+                          />
                         </div>
                         <div class="ml-4">
                           <div class="text-sm font-medium text-gray-900">
-                            {item.product.name}
+                            {item?.product?.name || 'Unknown Product'}
                           </div>
-                          {item.variant && (
+                          {item?.variant && item?.variant?.attributes && (
                             <div class="text-sm text-gray-500">
-                              {item.variant.attributes.map((attr) => attr.value).join(' / ')}
+                              {item.variant.attributes.map((attr: any) => attr?.value || '').filter(Boolean).join(' / ')}
                             </div>
                           )}
                         </div>
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">${item.unit_price}</div>
+                      <div class="text-sm text-gray-900">${item?.unit_price || '0.00'}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <div class="flex items-center">
                         <button
                           class="bg-gray-200 px-2 py-1 rounded-l-md"
                           data-action="decrease"
-                          data-item-id={item.id}
+                          data-item-id={item?.id || ''}
                         >
                           -
                         </button>
                         <input
                           type="number"
                           min="1"
-                          value={item.quantity}
+                          value={item?.quantity || 1}
                           class="w-12 text-center border-t border-b border-gray-300 py-1"
-                          data-item-id={item.id}
+                          data-item-id={item?.id || ''}
                         />
                         <button
                           class="bg-gray-200 px-2 py-1 rounded-r-md"
                           data-action="increase"
-                          data-item-id={item.id}
+                          data-item-id={item?.id || ''}
                         >
                           +
                         </button>
                       </div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
-                      <div class="text-sm text-gray-900">${item.total_price}</div>
+                      <div class="text-sm text-gray-900">${item?.total_price || '0.00'}</div>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <button
                         class="text-red-600 hover:text-red-900"
                         data-action="remove"
-                        data-item-id={item.id}
+                        data-item-id={item?.id || ''}
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -162,7 +174,7 @@ try {
             <div class="space-y-4">
               <div class="flex justify-between">
                 <span>Subtotal</span>
-                <span>${cart.subtotal}</span>
+                <span>${safeCart.subtotal}</span>
               </div>
               <div class="flex justify-between">
                 <span>Shipping</span>
@@ -170,7 +182,7 @@ try {
               </div>
               <div class="flex justify-between border-t border-gray-200 pt-4 font-semibold">
                 <span>Total</span>
-                <span>${cart.subtotal}</span>
+                <span>${safeCart.subtotal}</span>
               </div>
             </div>
             <a 

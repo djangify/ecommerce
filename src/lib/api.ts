@@ -64,13 +64,11 @@ export async function fetchCategories(): Promise<Category[]> {
 /** Cart */
 export async function fetchCart(): Promise<Cart> {
   try {
-    console.log('Fetching cart from:', `${API}/api/v1/cart/`);
+
     const response = await fetch(`${API}/api/v1/cart/`, {
       credentials: 'include', // Include cookies for session-based carts
     });
 
-    console.log('Cart response status:', response.status);
-    console.log('Cart response ok:', response.ok);
 
     if (!response.ok) {
       console.warn(`Cart fetch failed with status: ${response.status}`);
@@ -84,8 +82,7 @@ export async function fetchCart(): Promise<Cart> {
     }
 
     const cartData = await response.json();
-    console.log('Cart data received:', cartData);
-    console.log('Cart items:', cartData.items);
+
     return cartData;
   } catch (error) {
     console.error('Error fetching cart:', error);
