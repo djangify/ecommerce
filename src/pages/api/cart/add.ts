@@ -6,7 +6,7 @@ export const POST: APIRoute = async ({ request }) => {
     const body = await request.json();
 
     // Forward to Django backend
-    const response = await fetch('http://localhost:8000/api/v1/items/', {
+    const response = await fetch('https://corrison.djangify.com/api/v1/items/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

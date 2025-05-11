@@ -1,7 +1,7 @@
 import type { Product, Category, Cart, CartItem } from "../types";
 
 // Hardcode the API URL for local development
-const API = 'http://localhost:8000';
+const API = 'https://corrison.djangify.com';
 
 /**
  * Helper function to check API responses

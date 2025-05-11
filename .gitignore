@@ -5,12 +5,14 @@ dist/
 
 # dependencies
 node_modules/
+ 
 
 # logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+stderr.log 
 
 
 # environment variables
@@ -22,3 +24,7 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+server.mjs
+.htaccess
+entry.mjs

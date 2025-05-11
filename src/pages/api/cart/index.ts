@@ -5,7 +5,7 @@ export const GET: APIRoute = async ({ request, cookies }) => {
 
   try {
     // Forward to Django backend using the same pattern as the test
-    const response = await fetch('http://localhost:8000/api/v1/cart/', {
+    const response = await fetch('https://corrison.djangify.com/api/v1/cart/', {
       method: 'GET',
       credentials: 'include',
       headers: {

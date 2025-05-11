@@ -14,7 +14,7 @@ export default defineConfig({
     mode: 'standalone',
   }),
   build: {
-    site: 'https://ecommerce.todiane.com',
+    site: 'https://ecommerce.djangify.com',
     base: '/',
   },
 });
