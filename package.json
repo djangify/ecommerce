@@ -3,10 +3,12 @@
   "type": "module",
   "version": "1.0.0",
   "private": true,
+  "main": "app.cjs",
   "scripts": {
-    "start": "node dist/server/entry.mjs",
+    "start": "node app.cjs",
     "build": "astro build",
-    "astro": "astro"
+    "astro": "astro",
+    "dev": "astro dev"
   },
   "dependencies": {
     "@astrojs/node": "^9.2.1",

@@ -1,7 +1,12 @@
 import type { Product, Category, Cart, CartItem } from "../types";
 
 // Hardcode the API URL for local development
-const API = 'https://corrison.djangify.com';
+// const API = 'https://corrison.djangify.com';
+
+
+//  API URL for deployment with Railway 
+const API = import.meta.env.VITE_PUBLIC_API_URL;
+const res = await fetch(`${API}/items`);
 
 /**
  * Helper function to check API responses
