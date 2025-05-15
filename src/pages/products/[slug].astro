@@ -1,12 +1,12 @@
 ---
 // src/pages/products/[slug].astro - Dynamic implementation
-export const prerender = false;
-const API = import.meta.env.VITE_PUBLIC_API_URL;
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { fetchProduct, fetchProducts } from "../../lib/api";
 import type { Product } from "../../types";
+export const prerender = false;
+const API = import.meta.env.VITE_PUBLIC_API_URL;
 
 // Get slug from URL
 
@@ -28,9 +28,10 @@ try {
   console.error("Error fetching product:", error);
   isError = true;
 }
+const title = `${product?.name || "Product"} | Todiane Shop`;
 ---
 
-<BaseLayout title={`${product?.name || "Product"} | Todiane Shop`}>
+<BaseLayout title={title}>
   <Header slot="header" />
 
   <div class="container mx-auto px-4 py-12">
@@ -250,10 +251,10 @@ try {
         throw new Error(err.detail || "Add to cart failed");
       }
 
-      alert("✓ Product added to cart!");
+      alert("Product added to cart!");
     } catch (err) {
       console.error(err);
-      alert("⚠️ " + (err.message || "Could not add to cart"));
+      alert("ERROR" + (err.message || "Could not add to cart"));
     }
   });
 </script>

@@ -20,7 +20,12 @@ export const POST: APIRoute = async ({ request }) => {
         'Content-Type': 'application/json',
         'Cookie': request.headers.get('cookie') ?? '',
       },
-      body: JSON.stringify(body),
+      credentials: 'include',
+      body: JSON.stringify({
+        product: body.productId,
+        variant: body.variantId || null,
+        quantity: body.quantity || 1,
+      }),
     });
     const data = await response.json();
 
@@ -33,11 +38,13 @@ export const POST: APIRoute = async ({ request }) => {
       headers,
     });
   } catch (error) {
-    const headers = new Headers();
-    headers.set('Content-Type', 'application/json');
-    return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
-      { status: 500, headers }
-    );
+    return new Response(JSON.stringify({
+      error: error instanceof Error ? error.message : 'Unknown error'
+    }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 };
