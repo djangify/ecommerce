@@ -1,5 +1,6 @@
 ---
 // src/pages/cart/index.astro 
+const API = import.meta.env.VITE_PUBLIC_API_URL;
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
@@ -205,111 +206,75 @@ const safeCart = {
 
   <Footer slot="footer" />
 </BaseLayout>
+<script type="module">
+  // Base URL from Railway env-var
+  const API = import.meta.env.VITE_PUBLIC_API_URL;
 
-<script>
-  // Handle cart updates
+  // update an existing cart‐item
+  async function updateCartItem(itemId, quantity) {
+    const res = await fetch(`${API}/api/v1/items/${itemId}/`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ quantity }),
+    });
+    if (!res.ok) throw new Error('Failed to update cart');
+    return res.json();
+  }
+
+  // remove a cart‐item
+  async function removeCartItem(itemId) {
+    const res = await fetch(`${API}/api/v1/items/${itemId}/`, {
+      method: 'DELETE',
+      credentials: 'include',
+    });
+    if (!res.ok) throw new Error('Failed to remove item');
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
-    // Increase quantity
-    const increaseButtons = document.querySelectorAll('[data-action="increase"]');
-    increaseButtons.forEach(button => {
-      button.addEventListener('click', async () => {
-        const itemId = button.getAttribute('data-item-id');
-        if (!itemId) return;
-        
-        const inputEl = document.querySelector(`input[data-item-id="${itemId}"]`) as HTMLInputElement;
-        if (!inputEl) return;
-        
-        const currentQty = parseInt(inputEl.value);
-        
-        inputEl.value = (currentQty + 1).toString();
-        
+    // increase buttons
+    document.querySelectorAll('[data-action="increase"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-item-id');
+        if (!id) return;
+        const input = document.querySelector(`input[data-item-id="${id}"]`);
+        if (!input) return;
+        const oldQty = Number(input.value) || 1;
+        input.value = String(oldQty + 1);
+        try { await updateCartItem(id, oldQty + 1) }
+        catch (e) { console.error(e); input.value = String(oldQty) }
+      });
+    });
+
+    // decrease buttons
+    document.querySelectorAll('[data-action="decrease"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-item-id');
+        if (!id) return;
+        const input = document.querySelector(`input[data-item-id="${id}"]`);
+        if (!input) return;
+        const oldQty = Number(input.value) || 1;
+        if (oldQty > 1) {
+          input.value = String(oldQty - 1);
+          try { await updateCartItem(id, oldQty - 1) }
+          catch (e) { console.error(e); input.value = String(oldQty) }
+        }
+      });
+    });
+
+    // remove buttons
+    document.querySelectorAll('[data-action="remove"]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const id = btn.getAttribute('data-item-id');
+        if (!id || !confirm('Remove this item?')) return;
         try {
-          await updateCartItem(itemId, currentQty + 1);
-        } catch (error) {
-          console.error('Error updating cart:', error);
-          // Revert back on error
-          inputEl.value = currentQty.toString();
+          await removeCartItem(id);
+          window.location.reload();
+        } catch (e) {
+          console.error(e);
+          alert('Failed to remove item.');
         }
       });
     });
-    
-    // Decrease quantity
-    const decreaseButtons = document.querySelectorAll('[data-action="decrease"]');
-    decreaseButtons.forEach(button => {
-      button.addEventListener('click', async () => {
-        const itemId = button.getAttribute('data-item-id');
-        if (!itemId) return;
-        
-        const inputEl = document.querySelector(`input[data-item-id="${itemId}"]`) as HTMLInputElement;
-        if (!inputEl) return;
-        
-        const currentQty = parseInt(inputEl.value);
-        
-        if (currentQty > 1) {
-          inputEl.value = (currentQty - 1).toString();
-          
-          try {
-            await updateCartItem(itemId, currentQty - 1);
-          } catch (error) {
-            console.error('Error updating cart:', error);
-            // Revert back on error
-            inputEl.value = currentQty.toString();
-          }
-        }
-      });
-    });
-    
-    // Remove item
-    const removeButtons = document.querySelectorAll('[data-action="remove"]');
-    removeButtons.forEach(button => {
-      button.addEventListener('click', async () => {
-        const itemId = button.getAttribute('data-item-id');
-        if (!itemId) return;
-        
-        if (confirm('Are you sure you want to remove this item?')) {
-          try {
-            await removeCartItem(itemId);
-            // Reload page to reflect changes
-            window.location.reload();
-          } catch (error) {
-            console.error('Error removing item:', error);
-            alert('Failed to remove item. Please try again.');
-          }
-        }
-      });
-    });
-    
-    // Function to update cart item
-    async function updateCartItem(itemId: string, quantity: number) {
-      const response = await fetch(`https://corrison.djangify.com/api/v1/items/${itemId}/`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ quantity })
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update cart');
-      }
-      
-      return response.json();
-    }
-    
-    // Function to remove cart item
-    async function removeCartItem(itemId: string) {
-      const response = await fetch(`https://corrison.djangify.com/api/v1/items/${itemId}/`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to remove item');
-      }
-      
-      // No need to parse JSON for DELETE
-      return;
-    }
   });
 </script>

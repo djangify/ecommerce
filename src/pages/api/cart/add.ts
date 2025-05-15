@@ -1,43 +1,43 @@
-// src/pages/api/cart/add.ts
 import type { APIRoute } from 'astro';
+
+const API = import.meta.env.VITE_PUBLIC_API_URL;
+
+function forwardSetCookie(response: Response, headers: Headers) {
+  const raw = (response.headers as any).raw()?.['set-cookie'] as string[] | undefined;
+  if (!raw) return;
+  raw.forEach(cookie => {
+    const stripped = cookie.replace(/;\s*Domain=[^;]+/i, '');
+    headers.append('Set-Cookie', stripped);
+  });
+}
 
 export const POST: APIRoute = async ({ request }) => {
   try {
     const body = await request.json();
-
-    // Forward to Django backend
-    const response = await fetch('https://corrison.djangify.com/api/v1/items/', {
+    const response = await fetch(`${API}/api/v1/items/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Cookie': request.headers.get('cookie') || '',
+        'Cookie': request.headers.get('cookie') ?? '',
       },
-      credentials: 'include',
-      body: JSON.stringify({
-        product: body.productId,
-        variant: body.variantId || null,
-        quantity: body.quantity || 1,
-      }),
+      body: JSON.stringify(body),
     });
-
     const data = await response.json();
+
+    const headers = new Headers(response.headers);
+    headers.set('Content-Type', 'application/json');
+    forwardSetCookie(response, headers);
 
     return new Response(JSON.stringify(data), {
       status: response.status,
-      headers: {
-        'Content-Type': 'application/json',
-        ...Object.fromEntries(Array.from(response.headers.entries())),
-      },
+      headers,
     });
-
   } catch (error) {
-    return new Response(JSON.stringify({
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }), {
-      status: 500,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
+    const headers = new Headers();
+    headers.set('Content-Type', 'application/json');
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
+      { status: 500, headers }
+    );
   }
 };
