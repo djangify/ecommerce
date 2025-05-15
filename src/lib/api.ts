@@ -6,7 +6,6 @@ import type { Product, Category, Cart, CartItem } from "../types";
 
 //  API URL for deployment with Railway 
 const API = import.meta.env.VITE_PUBLIC_API_URL;
-const res = await fetch(`${API}/items`);
 
 /**
  * Helper function to check API responses
