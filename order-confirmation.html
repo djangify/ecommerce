@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- ============================================ -->
+    <!-- HEAD SECTION - Copy this to all pages -->
+    <!-- ============================================ -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - Your Store Name</title>
+    <meta name="description" content="Your order has been confirmed">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+
+<body class="bg-slate-50 text-slate-900">
+    <!-- ============================================ -->
+    <!-- NAVIGATION - Simplified for confirmation -->
+    <!-- ============================================ -->
+    <header class="bg-white border-b border-slate-200">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                
+                <!-- Logo -->
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 bg-teal-600 rounded flex items-center justify-center">
+                        <span class="text-white font-bold text-lg">S</span>
+                    </div>
+                    <span class="text-xl font-semibold text-slate-900">Store Name</span>
+                </div>
+
+                <!-- Checkout Progress -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <div class="flex items-center text-sm">
+                        <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center font-semibold mr-2">✓</div>
+                        <span class="text-teal-600 font-medium">Cart</span>
+                    </div>
+                    <div class="w-8 border-t border-teal-600"></div>
+                    <div class="flex items-center text-sm">
+                        <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center font-semibold mr-2">✓</div>
+                        <span class="text-teal-600 font-medium">Checkout</span>
+                    </div>
+                    <div class="w-8 border-t border-teal-600"></div>
+                    <div class="flex items-center text-sm">
+                        <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center font-semibold mr-2">✓</div>
+                        <span class="text-teal-600 font-medium">Complete</span>
+                    </div>
+                </div>
+
+                <!-- Return to Store -->
+                <a href="index.html" class="text-slate-600 hover:text-teal-600 font-medium">
+                    Continue Shopping
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- ============================================ -->
+    <!-- PAGE CONTENT - Order Confirmation -->
+    <!-- ============================================ -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        
+        <!-- Success Message -->
+        <div class="text-center mb-12">
+            <div class="w-20 h-20 bg-green-100 rounded-full mx-auto flex items-center justify-center mb-6">
+                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+            </div>
+            <h1 class="text-3xl font-bold text-slate-900 mb-4">Order Confirmed!</h1>
+            <p class="text-lg text-slate-600 mb-2">Thank you for your purchase</p>
+            <p class="text-slate-500">Order #<span id="order-number" class="font-mono font-semibold">ORD-2024-001234</span></p>
+        </div>
+
+        <!-- Order Details -->
+        <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+            <h2 class="text-xl font-semibold text-slate-900 mb-6">Order Details</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <!-- Shipping Address -->
+                <div>
+                    <h3 class="font-semibold text-slate-900 mb-3">Shipping Address</h3>
+                    <div class="text-slate-600 text-sm leading-relaxed">
+                        <p class="font-medium text-slate-900">John Doe</p>
+                        <p>123 Main Street</p>
+                        <p>Apt 4B</p>
+                        <p>New York, NY 10001</p>
+                        <p>United States</p>
+                    </div>
+                </div>
+                
+                <!-- Order Info -->
+                <div>
+                    <h3 class="font-semibold text-slate-900 mb-3">Order Information</h3>
+                    <div class="text-slate-600 text-sm space-y-2">
+                        <div class="flex justify-between">
+                            <span>Order Date:</span>
+                            <span class="text-slate-900 font-medium" id="order-date">January 15, 2024</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Payment Method:</span>
+                            <span class="text-slate-900 font-medium">•••• •••• •••• 1234</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Shipping Method:</span>
+                            <span class="text-slate-900 font-medium">Standard Shipping</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Estimated Delivery:</span>
+                            <span class="text-slate-900 font-medium">January 22-24, 2024</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="border-t border-slate-200 pt-8">
+                <h3 class="font-semibold text-slate-900 mb-6">Items Ordered</h3>
+                
+                <div class="space-y-6">
+                    <!-- Order Item 1 -->
+                    <div class="flex items-center gap-6">
+                        <div class="w-20 h-20 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
+                            <img 
+                                src="https://via.placeholder.com/100x100/e2e8f0/64748b?text=Product+1" 
+                                alt="Product"
+                                class="w-full h-full object-cover"
+                            >
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium text-slate-900 mb-1">Premium Product Name</h4>
+                            <p class="text-sm text-slate-600 mb-1">Color: Black, Size: Medium</p>
+                            <p class="text-sm text-slate-500">SKU: PRD-001-BLK-MD</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-slate-900">$199.98</p>
+                            <p class="text-sm text-slate-500">Qty: 2</p>
+                        </div>
+                    </div>
+
+                    <!-- Order Item 2 -->
+                    <div class="flex items-center gap-6">
+                        <div class="w-20 h-20 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
+                            <img 
+                                src="https://via.placeholder.com/100x100/e2e8f0/64748b?text=Product+2" 
+                                alt="Product"
+                                class="w-full h-full object-cover"
+                            >
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="font-medium text-slate-900 mb-1">Another Great Product</h4>
+                            <p class="text-sm text-slate-600 mb-1">Color: White, Size: Large</p>
+                            <p class="text-sm text-slate-500">SKU: PRD-002-WHT-LG</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-slate-900">$149.99</p>
+                            <p class="text-sm text-slate-500">Qty: 1</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Total -->
+            <div class="border-t border-slate-200 mt-8 pt-6">
+                <div class="max-w-sm ml-auto space-y-3">
+                    <div class="flex justify-between text-slate-600">
+                        <span>Subtotal:</span>
+                        <span class="text-slate-900 font-medium">$349.97</span>
+                    </div>
+                    <div class="flex justify-between text-slate-600">
+                        <span>Shipping:</span>
+                        <span class="text-slate-900 font-medium">$5.99</span>
+                    </div>
+                    <div class="flex justify-between text-slate-600">
+                        <span>Tax:</span>
+                        <span class="text-slate-900 font-medium">$35.60</span>
+                    </div>
+                    <div class="flex justify-between text-slate-600">
+                        <span>Discount:</span>
+                        <span class="text-green-600 font-medium">-$10.00</span>
+                    </div>
+                    <div class="border-t border-slate-200 pt-3">
+                        <div class="flex justify-between">
+                            <span class="text-lg font-semibold text-slate-900">Total:</span>
+                            <span class="text-lg font-bold text-slate-900">$381.56</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- What's Next -->
+        <div class="bg-white rounded-lg shadow-sm p-8 mb-8">
+            <h2 class="text-xl font-semibold text-slate-900 mb-6">What's Next?</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-blue-100 rounded-full mx-auto flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-slate-900 mb-2">Order Confirmation</h3>
+                    <p class="text-sm text-slate-600">You'll receive an email confirmation shortly with your order details.</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-orange-100 rounded-full mx-auto flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-slate-900 mb-2">Order Processing</h3>
+                    <p class="text-sm text-slate-600">We'll prepare your order for shipment within 1-2 business days.</p>
+                </div>
+                
+                <div class="text-center">
+                    <div class="w-12 h-12 bg-green-100 rounded-full mx-auto flex items-center justify-center mb-4">
+                        <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="font-semibold text-slate-900 mb-2">Delivery</h3>
+                    <p class="text-sm text-slate-600">Track your package and receive delivery updates via email and SMS.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a 
+                href="index.html" 
+                class="inline-flex items-center justify-center px-6 py-3 border border-slate-300 rounded-md text-slate-700 font-medium hover:bg-slate-50 transition-colors"
+            >
+                Continue Shopping
+            </a>
+            <a 
+                href="account.html" 
+                class="inline-flex items-center justify-center px-6 py-3 bg-slate-900 text-white rounded-md font-medium hover:bg-slate-800 transition-colors"
+            >
+                View Order Status
+            </a>
+        </div>
+
+        <!-- Contact Info -->
+        <div class="text-center mt-12 pt-8 border-t border-slate-200">
+            <p class="text-slate-600 mb-2">Questions about your order?</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <a href="mailto:support@storename.com" class="text-teal-600 hover:text-teal-700 font-medium">
+                    Email Support
+                </a>
+                <span class="hidden sm:inline text-slate-400">•</span>
+                <a href="tel:+1234567890" class="text-teal-600 hover:text-teal-700 font-medium">
+                    Call (123) 456-7890
+                </a>
+                <span class="hidden sm:inline text-slate-400">•</span>
+                <a href="faq.html" class="text-teal-600 hover:text-teal-700 font-medium">
+                    Visit FAQ
+                </a>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Custom JavaScript -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/products.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        // Order confirmation specific JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get order number from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderNumber = urlParams.get('order');
+            
+            if (orderNumber) {
+                document.getElementById('order-number').textContent = orderNumber;
+                loadOrderDetails(orderNumber);
+            }
+            
+            // Set current date
+            const today = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('order-date').textContent = today.toLocaleDateString('en-US', options);
+        });
+
+        async function loadOrderDetails(orderNumber) {
+            try {
+                const response = await fetch(`${window.CONFIG.apiBaseUrl}/orders/${orderNumber}/`, {
+                    credentials: 'include'
+                });
+                
+                if (response.ok) {
+                    const order = await response.json();
+                    updateOrderDisplay(order);
+                }
+            } catch (error) {
+                console.error('Error loading order details:', error);
+            }
+        }
+
+        function updateOrderDisplay(order) {
+            // Update page with real order data
+            console.log('Order details:', order);
+            // Implementation to populate with real order data
+        }
+    </script>
+</body>
+</html>
