@@ -159,18 +159,23 @@ class UIManager {
 
   // Category display
   displayCategories(categories) {
-    const categoryFilter = document.querySelector('select:first-of-type');
+    const categoryFilter = document.getElementById('category-filter');
     if (!categoryFilter) {
       console.warn('Category filter element not found');
       return;
     }
 
+    // Keep the existing "All Categories" option
+    const currentValue = categoryFilter.value;
     categoryFilter.innerHTML = '<option value="">All Categories</option>';
 
     categories.forEach(category => {
       const option = document.createElement('option');
       option.value = category.slug;
       option.textContent = category.name;
+      if (category.slug === currentValue) {
+        option.selected = true;
+      }
       categoryFilter.appendChild(option);
     });
   }

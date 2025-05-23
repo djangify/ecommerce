@@ -90,7 +90,10 @@ class APIClient {
     // If productSlugOrId is a string (slug), we need to get the product ID first
     let productId = productSlugOrId;
 
-    if (typeof productSlugOrId === 'string') {
+    // Check if it's a UUID (has dashes in UUID format) or a slug
+    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productSlugOrId);
+
+    if (!isUUID && typeof productSlugOrId === 'string') {
       console.log('Converting product slug to ID:', productSlugOrId);
       try {
         const product = await this.getProduct(productSlugOrId);

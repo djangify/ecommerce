@@ -237,7 +237,7 @@ class ProductManager {
 
   setupFilters() {
     // Category filter
-    const categoryFilter = document.querySelector('select');
+    const categoryFilter = document.getElementById('category-filter');
     if (categoryFilter) {
       categoryFilter.addEventListener('change', (e) => {
         const filters = this.getActiveFilters();
@@ -246,7 +246,7 @@ class ProductManager {
     }
 
     // Price filter
-    const priceFilter = document.querySelectorAll('select')[1];
+    const priceFilter = document.getElementById('price-filter');
     if (priceFilter) {
       priceFilter.addEventListener('change', (e) => {
         const filters = this.getActiveFilters();
@@ -255,7 +255,7 @@ class ProductManager {
     }
 
     // Sort filter
-    const sortFilter = document.querySelectorAll('select')[2];
+    const sortFilter = document.getElementById('sort-filter');
     if (sortFilter) {
       sortFilter.addEventListener('change', (e) => {
         const filters = this.getActiveFilters();
@@ -264,15 +264,18 @@ class ProductManager {
     }
   }
 
+  // In products.js, in the getActiveFilters() function, update the sort filter section
   getActiveFilters() {
     const filters = {};
 
-    const categoryFilter = document.querySelector('select');
+    // Get category from dropdown if it exists
+    const categoryFilter = document.getElementById('category-filter');
     if (categoryFilter && categoryFilter.value) {
       filters.category = categoryFilter.value;
     }
 
-    const priceFilter = document.querySelectorAll('select')[1];
+    // Price filter - backend expects min_price and max_price
+    const priceFilter = document.getElementById('price-filter');
     if (priceFilter && priceFilter.value) {
       const priceRange = priceFilter.value;
       if (priceRange === 'under25') {
@@ -288,28 +291,28 @@ class ProductManager {
       }
     }
 
-    const sortFilter = document.querySelectorAll('select')[2];
+    // Sort filter - DRF expects 'ordering' parameter
+    const sortFilter = document.getElementById('sort-filter');
     if (sortFilter && sortFilter.value) {
-      const sortValue = sortFilter.value;
-      if (sortValue === 'price_low') {
-        filters.ordering = 'price';
-      } else if (sortValue === 'price_high') {
-        filters.ordering = '-price';
-      } else if (sortValue === 'newest') {
-        filters.ordering = '-created_at';
-      } else if (sortValue === 'name') {
-        filters.ordering = 'name';
-      }
+      // Map frontend sort values to backend ordering values
+      const sortMap = {
+        'price_low': 'effective_price',
+        'price_high': '-effective_price',
+        'newest': '-created_at',
+        'name': 'name'
+      };
+      filters.ordering = sortMap[sortFilter.value] || sortFilter.value;
     }
 
+    // Search query
     const searchInput = document.getElementById('search-input');
     if (searchInput && searchInput.value.trim()) {
       filters.search = searchInput.value.trim();
     }
 
+    console.log('Active filters being sent:', filters);
     return filters;
   }
-
   // Product detail page specific methods
   selectThumbnail(index) {
     // Update thumbnail selection without loading images

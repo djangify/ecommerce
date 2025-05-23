@@ -127,6 +127,7 @@ class App {
 
   initPageSpecificFeatures() {
     const currentPage = this.getCurrentPage();
+    console.log('Current page:', currentPage);
 
     switch (currentPage) {
       case 'product':
@@ -139,11 +140,14 @@ class App {
         this.initCheckoutPage();
         break;
       default:
-        // Main shop page - already handled in loadInitialData
+        // Main shop page - make sure filters are set up
+        console.log('Initializing shop page filters');
+        if (window.productManager) {
+          window.productManager.setupFilters();
+        }
         break;
     }
   }
-
   initProductPage() {
     const productSlug = window.productManager.getProductSlugFromURL();
     if (productSlug) {
