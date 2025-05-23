@@ -17,8 +17,9 @@ window.API_ENDPOINTS = {
   cart: '/cart/',
   cartItems: '/items/',  // Fixed: was '/cart/items/' now '/items/'
   wishlist: '/wishlist/',
-  pages: '/pages/',  // Added pages endpoint
-  contact: '/contact/',  // Added contact endpoint
+  pages: '/pages/',
+  contact: '/contact/',
+  contactSettings: '/contact-settings/',
   orders: '/orders/'
 };
 
