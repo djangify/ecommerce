@@ -101,74 +101,25 @@
             </div>
         </div>
 
+        <!-- Error State (hidden initially) -->
+        <div id="error-state" class="flex justify-center items-center min-h-screen" style="display: none;">
+            <div class="text-center max-w-md">
+                <div class="w-20 h-20 bg-red-100 rounded-full mx-auto flex items-center justify-center mb-6">
+                    <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-900 mb-4">Page Not Found</h2>
+                <p class="text-slate-600 mb-8">The about page has not been created yet. Please create a page with slug "about" in the Django admin.</p>
+                <a href="index.html" class="inline-block bg-slate-900 text-white py-2 px-6 rounded-md font-semibold hover:bg-slate-800 transition-colors">
+                    Return to Shop
+                </a>
+            </div>
+        </div>
+
         <!-- Page Content (hidden initially) -->
         <div id="page-content" style="display: none;">
-            <!-- Hero Section -->
-            <section id="hero-section" class="relative bg-slate-50 py-16 lg:py-24">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                        <div>
-                            <h1 id="hero-title" class="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">About Us</h1>
-                            <div id="hero-subtitle" class="text-xl text-slate-600 mb-6"></div>
-                            <div id="hero-content" class="prose prose-lg text-slate-600"></div>
-                            <div id="hero-button-container" class="mt-8" style="display: none;">
-                                <a id="hero-button" href="#" class="inline-block bg-slate-900 text-white py-3 px-8 rounded-md font-semibold hover:bg-slate-800 transition-colors">
-                                    Learn More
-                                </a>
-                            </div>
-                        </div>
-                        <div id="hero-image-container" class="relative">
-                            <div id="hero-image-placeholder" class="aspect-square bg-slate-200 rounded-lg overflow-hidden">
-                                <div class="w-full h-full flex items-center justify-center">
-                                    <p class="text-slate-500">Loading image...</p>
-                                </div>
-                            </div>
-                            <div id="hero-right-content" class="bg-white p-8 rounded-lg shadow-lg" style="display: none;">
-                                <!-- Dynamic content will be inserted here -->
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Main Content Section -->
-            <section class="py-16">
-                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div id="main-content" class="prose prose-lg max-w-none">
-                        <!-- Main content will be loaded here -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Features Section -->
-            <section id="features-section" class="py-16 bg-slate-50" style="display: none;">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 id="feature-section-title" class="text-3xl font-bold text-center text-slate-900 mb-12">Why Choose Us</h2>
-                    <div id="features-grid" class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                        <!-- Features will be loaded here -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- Middle Section -->
-            <section id="middle-section" class="py-16" style="display: none;">
-                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <h2 id="middle-section-title" class="text-3xl font-bold text-slate-900 mb-8"></h2>
-                    <div id="middle-section-content" class="prose prose-lg max-w-none">
-                        <!-- Middle section content will be loaded here -->
-                    </div>
-                </div>
-            </section>
-
-            <!-- End Section -->
-            <section id="end-section" class="py-16 bg-slate-900 text-white" style="display: none;">
-                <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                    <h2 id="end-section-title" class="text-3xl font-bold mb-8"></h2>
-                    <div id="end-section-content" class="prose prose-lg prose-invert max-w-none mx-auto">
-                        <!-- End section content will be loaded here -->
-                    </div>
-                </div>
-            </section>
+            <!-- The content will be dynamically inserted here based on the page data -->
         </div>
 
     </main>
@@ -267,17 +218,162 @@
     <!-- Custom JavaScript -->
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
+    <script src="js/main.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/cart.js"></script>
     <script src="js/products.js"></script>
-    <script src="js/main.js"></script>
     
     <script>
+        // Function to render page content based on the data structure
+        function renderPageContent(pageData) {
+            let contentHTML = '';
+            
+            // Hero Section
+            if (pageData.hero_title || pageData.title) {
+                contentHTML += `
+                    <section class="relative bg-slate-50 py-16 lg:py-24">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                                <div>
+                                    <h1 class="text-4xl lg:text-5xl font-bold text-slate-900 mb-6">
+                                        ${pageData.hero_title || pageData.title}
+                                    </h1>
+                                    ${pageData.hero_subtitle ? `
+                                        <p class="text-xl text-slate-600 mb-6">${pageData.hero_subtitle}</p>
+                                    ` : ''}
+                                    ${pageData.subtitle ? `
+                                        <p class="text-xl text-slate-600 mb-6">${pageData.subtitle}</p>
+                                    ` : ''}
+                                    ${pageData.hero_content ? `
+                                        <div class="prose prose-lg text-slate-600">${pageData.hero_content}</div>
+                                    ` : ''}
+                                    ${pageData.hero_button_text && pageData.hero_button_url ? `
+                                        <div class="mt-8">
+                                            <a href="${pageData.hero_button_url}" class="inline-block bg-slate-900 text-white py-3 px-8 rounded-md font-semibold hover:bg-slate-800 transition-colors">
+                                                ${pageData.hero_button_text}
+                                            </a>
+                                        </div>
+                                    ` : ''}
+                                </div>
+                                <div class="relative">
+                                    ${pageData.hero_right_content ? `
+                                        <div class="bg-white p-8 rounded-lg shadow-lg">
+                                            ${pageData.hero_right_content}
+                                        </div>
+                                    ` : pageData.hero_image ? `
+                                        <div class="aspect-square bg-slate-200 rounded-lg overflow-hidden">
+                                            <img src="${pageData.hero_image}" alt="${pageData.title}" class="w-full h-full object-cover">
+                                        </div>
+                                    ` : pageData.hero_image_url ? `
+                                        <div class="aspect-square bg-slate-200 rounded-lg overflow-hidden">
+                                            <img src="${pageData.hero_image_url}" alt="${pageData.title}" class="w-full h-full object-cover">
+                                        </div>
+                                    ` : `
+                                        <div class="aspect-square bg-slate-100 rounded-lg overflow-hidden flex items-center justify-center">
+                                            <div class="text-center p-8">
+                                                <svg class="w-24 h-24 text-slate-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                                </svg>
+                                                <p class="text-slate-500 text-lg">About Our Store</p>
+                                            </div>
+                                        </div>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }
+            
+            // Main Content
+            if (pageData.content) {
+                contentHTML += `
+                    <section class="py-16">
+                        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <div class="prose prose-lg max-w-none">
+                                ${pageData.content}
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }
+            
+            // Features Section
+            if (pageData.has_feature_section && pageData.features && pageData.features.length > 0) {
+                contentHTML += `
+                    <section class="py-16 bg-slate-50">
+                        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            ${pageData.feature_section_title ? `
+                                <h2 class="text-3xl font-bold text-center text-slate-900 mb-12">${pageData.feature_section_title}</h2>
+                            ` : ''}
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                ${pageData.features.map(feature => `
+                                    <div class="text-center">
+                                        ${feature.icon ? `
+                                            <div class="w-16 h-16 bg-teal-100 rounded-full mx-auto flex items-center justify-center mb-4">
+                                                <span class="text-teal-600 text-2xl">${feature.icon}</span>
+                                            </div>
+                                        ` : ''}
+                                        <h3 class="text-xl font-semibold text-slate-900 mb-3">${feature.title}</h3>
+                                        <p class="text-slate-600">${feature.content}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </section>
+                `;
+            }
+            
+            // Middle Section
+            if (pageData.middle_section_title || pageData.middle_section_content) {
+                contentHTML += `
+                    <section class="py-16">
+                        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                            ${pageData.middle_section_title ? `
+                                <h2 class="text-3xl font-bold text-slate-900 mb-8">${pageData.middle_section_title}</h2>
+                            ` : ''}
+                            ${pageData.middle_section_content ? `
+                                <div class="prose prose-lg max-w-none">
+                                    ${pageData.middle_section_content}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </section>
+                `;
+            }
+            
+            // End Section
+            if (pageData.end_section_title || pageData.end_section_content) {
+                contentHTML += `
+                    <section class="py-16 bg-slate-900 text-white">
+                        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                            ${pageData.end_section_title ? `
+                                <h2 class="text-3xl font-bold mb-8">${pageData.end_section_title}</h2>
+                            ` : ''}
+                            ${pageData.end_section_content ? `
+                                <div class="prose prose-lg prose-invert max-w-none mx-auto">
+                                    ${pageData.end_section_content}
+                                </div>
+                            ` : ''}
+                        </div>
+                    </section>
+                `;
+            }
+            
+            return contentHTML;
+        }
+        
         // Load about page content
         async function loadAboutPage() {
             try {
-                // Fetch the about page from the pages API
-                const response = await fetch(`${window.CONFIG.apiBaseUrl}/pages/about/`);
+                // First try to fetch the page with slug "about"
+                let response = await fetch(`${window.CONFIG.apiBaseUrl}/pages/about/`);
+                
+                // If "about" doesn't exist, try "ecommerce-about" (what you created)
+                if (!response.ok) {
+                    console.log('Page with slug "about" not found, trying "ecommerce-about"');
+                    response = await fetch(`${window.CONFIG.apiBaseUrl}/pages/ecommerce-about/`);
+                }
                 
                 if (!response.ok) {
                     throw new Error('Page not found');
@@ -292,106 +388,9 @@
                     document.querySelector('meta[name="description"]').setAttribute('content', pageData.meta_description);
                 }
                 
-                // Update hero section
-                if (pageData.hero_title) {
-                    document.getElementById('hero-title').textContent = pageData.hero_title;
-                } else {
-                    document.getElementById('hero-title').textContent = pageData.title;
-                }
-                
-                if (pageData.hero_subtitle) {
-                    document.getElementById('hero-subtitle').textContent = pageData.hero_subtitle;
-                }
-                
-                if (pageData.hero_content) {
-                    document.getElementById('hero-content').innerHTML = pageData.hero_content;
-                }
-                
-                // Handle hero image or right content
-                if (pageData.hero_right_content) {
-                    // Use right content instead of image
-                    document.getElementById('hero-image-placeholder').style.display = 'none';
-                    const rightContent = document.getElementById('hero-right-content');
-                    rightContent.innerHTML = pageData.hero_right_content;
-                    rightContent.style.display = 'block';
-                } else if (pageData.hero_image) {
-                    // Use hero image
-                    document.getElementById('hero-image-placeholder').innerHTML = `
-                        <img src="${pageData.hero_image}" alt="${pageData.title}" class="w-full h-full object-cover">
-                    `;
-                } else {
-                    // Show placeholder
-                    document.getElementById('hero-image-placeholder').innerHTML = `
-                        <div class="w-full h-full flex flex-col items-center justify-center text-center p-8">
-                            <svg class="w-24 h-24 text-slate-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                            </svg>
-                            <p class="text-slate-500 text-lg">About Our Store</p>
-                        </div>
-                    `;
-                }
-                
-                // Handle hero button
-                if (pageData.hero_button_text && pageData.hero_button_url) {
-                    const buttonContainer = document.getElementById('hero-button-container');
-                    const button = document.getElementById('hero-button');
-                    button.textContent = pageData.hero_button_text;
-                    button.href = pageData.hero_button_url;
-                    buttonContainer.style.display = 'block';
-                }
-                
-                // Update main content
-                if (pageData.content) {
-                    document.getElementById('main-content').innerHTML = pageData.content;
-                }
-                
-                // Handle features section
-                if (pageData.has_feature_section && pageData.features && pageData.features.length > 0) {
-                    document.getElementById('features-section').style.display = 'block';
-                    
-                    if (pageData.feature_section_title) {
-                        document.getElementById('feature-section-title').textContent = pageData.feature_section_title;
-                    }
-                    
-                    const featuresGrid = document.getElementById('features-grid');
-                    featuresGrid.innerHTML = pageData.features.map(feature => `
-                        <div class="text-center">
-                            ${feature.icon ? `
-                                <div class="w-16 h-16 bg-teal-100 rounded-full mx-auto flex items-center justify-center mb-4">
-                                    <span class="text-teal-600 text-2xl">${feature.icon}</span>
-                                </div>
-                            ` : ''}
-                            <h3 class="text-xl font-semibold text-slate-900 mb-3">${feature.title}</h3>
-                            <p class="text-slate-600">${feature.content}</p>
-                        </div>
-                    `).join('');
-                }
-                
-                // Handle middle section
-                if (pageData.middle_section_title || pageData.middle_section_content) {
-                    document.getElementById('middle-section').style.display = 'block';
-                    
-                    if (pageData.middle_section_title) {
-                        document.getElementById('middle-section-title').textContent = pageData.middle_section_title;
-                    }
-                    
-                    if (pageData.middle_section_content) {
-                        document.getElementById('middle-section-content').innerHTML = pageData.middle_section_content;
-                    }
-                }
-                
-                // Handle end section
-                if (pageData.end_section_title || pageData.end_section_content) {
-                    document.getElementById('end-section').style.display = 'block';
-                    
-                    if (pageData.end_section_title) {
-                        document.getElementById('end-section-title').textContent = pageData.end_section_title;
-                    }
-                    
-                    if (pageData.end_section_content) {
-                        document.getElementById('end-section-content').innerHTML = pageData.end_section_content;
-                    }
-                }
+                // Render the page content
+                const pageContentDiv = document.getElementById('page-content');
+                pageContentDiv.innerHTML = renderPageContent(pageData);
                 
                 // Hide loading and show content
                 document.getElementById('loading-state').style.display = 'none';
@@ -400,24 +399,9 @@
             } catch (error) {
                 console.error('Error loading about page:', error);
                 
-                // Show default content on error
+                // Hide loading and show error state
                 document.getElementById('loading-state').style.display = 'none';
-                document.getElementById('page-content').style.display = 'block';
-                
-                // Set default content
-                document.getElementById('hero-title').textContent = 'About Us';
-                document.getElementById('hero-subtitle').textContent = 'Your trusted partner for quality products';
-                document.getElementById('main-content').innerHTML = `
-                    <p>Welcome to our store. We are committed to providing you with the best products and exceptional customer service.</p>
-                    <p>Our journey began with a simple goal: to make quality products accessible to everyone. Today, we continue to uphold this mission by carefully selecting each item in our collection.</p>
-                    <h2>Our Values</h2>
-                    <ul>
-                        <li><strong>Quality:</strong> We never compromise on the quality of our products</li>
-                        <li><strong>Service:</strong> Customer satisfaction is our top priority</li>
-                        <li><strong>Trust:</strong> We build lasting relationships with our customers</li>
-                        <li><strong>Innovation:</strong> We continuously improve our offerings</li>
-                    </ul>
-                `;
+                document.getElementById('error-state').style.display = 'flex';
             }
         }
         

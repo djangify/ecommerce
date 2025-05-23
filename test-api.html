@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>API Test</title>
+</head>
+<body>
+    <h1>Testing API Connection</h1>
+    <button onclick="testAPI()">Test API</button>
+    <div id="result"></div>
+    
+    <script>
+    async function testAPI() {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = 'Testing...';
+        
+        try {
+            // Test 1: Simple fetch without credentials
+            const response1 = await fetch('https://corrison.corrisonapi.com/api/v1/pages/');
+            resultDiv.innerHTML += '<br>Test 1 (no credentials): ' + (response1.ok ? 'SUCCESS' : 'FAILED');
+            
+            // Test 2: Fetch with credentials
+            const response2 = await fetch('https://corrison.corrisonapi.com/api/v1/pages/', {
+                credentials: 'include'
+            });
+            resultDiv.innerHTML += '<br>Test 2 (with credentials): ' + (response2.ok ? 'SUCCESS' : 'FAILED');
+            
+            // Test 3: Products endpoint
+            const response3 = await fetch('https://corrison.corrisonapi.com/api/v1/products/');
+            resultDiv.innerHTML += '<br>Test 3 (products): ' + (response3.ok ? 'SUCCESS' : 'FAILED');
+            
+            if (response3.ok) {
+                const data = await response3.json();
+                resultDiv.innerHTML += '<br>Products data: ' + JSON.stringify(data);
+            }
+            
+        } catch (error) {
+            resultDiv.innerHTML += '<br>ERROR: ' + error.message;
+            console.error('Full error:', error);
+        }
+    }
+    </script>
+</body>
+</html>
