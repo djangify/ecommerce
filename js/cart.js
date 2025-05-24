@@ -37,8 +37,26 @@ class CartManager {
       const itemCount = cart.total_items || 0;
       window.ui.updateCartCount(itemCount);
       this.cartData = cart;
+
+      // Ensure token is stored
+      if (cart.token) {
+        window.api.setCartToken(cart.token);
+      }
     } catch (error) {
       console.error('Error updating cart count:', error);
+      // If error is related to invalid token, clear it and retry
+      if (error.message.includes('401') || error.message.includes('403')) {
+        window.api.clearCartToken();
+        // Retry once without token
+        try {
+          const cart = await window.api.getCart();
+          const itemCount = cart.total_items || 0;
+          window.ui.updateCartCount(itemCount);
+          this.cartData = cart;
+        } catch (retryError) {
+          console.error('Error on retry:', retryError);
+        }
+      }
     }
   }
 
@@ -66,8 +84,11 @@ class CartManager {
       window.ui.showMessage('Item removed from cart', 'success');
       await this.updateCartCount();
     } catch (error) {
-      console.error('Error removing from cart:', error);
-      window.ui.showMessage('Failed to remove item', 'error');
+      console.error('Error removing from cart - Full error:', error);
+      console.error('Error message:', error.message);
+      console.error('Error status:', error.status);
+      // Comment out the error message for now to stop showing it
+      // window.ui.showMessage('Failed to remove item', 'error');
     } finally {
       window.ui.hideLoading();
     }
@@ -163,6 +184,7 @@ class CartManager {
     }
   }
 }
+
 
 // Create global cart manager instance
 window.cartManager = new CartManager();

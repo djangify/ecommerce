@@ -343,10 +343,8 @@
     <script>
         // Cart-specific functions
         async function removeCartItem(itemId) {
-            if (confirm('Are you sure you want to remove this item from your cart?')) {
-                await window.cartManager.removeFromCart(itemId);
-                await loadCartPage();
-            }
+            await window.cartManager.removeFromCart(itemId);
+            await loadCartPage();
         }
 
         async function updateItemQuantity(itemId, delta) {

@@ -246,7 +246,7 @@
                         <button 
                             id="add-to-cart-btn"
                             class="flex-1 bg-slate-900 text-white py-3 px-6 rounded-md font-semibold hover:bg-slate-800 transition-colors"
-                            onclick="addToCartWithQuantity()"
+                            onclick="window.productManager.addToCartWithQuantity()"
                             disabled
                         >
                             Loading...
@@ -260,7 +260,7 @@
                     <button 
                         id="wishlist-btn"
                         class="w-full flex items-center justify-center gap-2 py-3 px-6 border border-slate-300 rounded-md text-slate-700 hover:bg-slate-50 transition-colors"
-                        onclick="toggleWishlist(getProductIdFromURL())"
+                        onclick="window.cartManager.toggleWishlist(window.productManager.currentProduct.id)"
                         disabled
                     >
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

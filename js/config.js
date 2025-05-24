@@ -29,3 +29,8 @@ window.UI_CONSTANTS = {
   messageTimeout: 5000,
   animationDuration: 300
 };
+
+window.CONFIG = {
+  apiBaseUrl: 'https://corrison.corrisonapi.com/api/v1',
+  cartId: localStorage.getItem('cartId') || null
+};

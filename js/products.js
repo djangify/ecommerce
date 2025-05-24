@@ -14,12 +14,22 @@ class ProductManager {
 
     console.log('Loading products with filters:', filters);
 
+
     try {
       this.isLoading = true;
       window.ui.showLoading();
 
       const data = await window.api.getProducts(filters);
       const products = data.results || data;
+
+      // Debug: Check if products have IDs
+      console.log('Products received:', products);
+      if (products.length > 0) {
+        console.log('First product structure:', products[0]);
+        console.log('First product:', products[0]);
+        console.log('Product ID field:', products[0].id);
+        console.log('Product keys:', Object.keys(products[0]));
+      }
 
       window.ui.displayProducts(products);
       this.currentFilters = filters;

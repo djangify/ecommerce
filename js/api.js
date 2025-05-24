@@ -6,6 +6,22 @@ class APIClient {
   constructor() {
     this.baseUrl = window.CONFIG.apiBaseUrl;
     this.retryCount = 0;
+    this.cartToken = this.getCartToken();
+  }
+
+  // Cart token management
+  getCartToken() {
+    return localStorage.getItem('cart_token');
+  }
+
+  setCartToken(token) {
+    localStorage.setItem('cart_token', token);
+    this.cartToken = token;
+  }
+
+  clearCartToken() {
+    localStorage.removeItem('cart_token');
+    this.cartToken = null;
   }
 
   async makeRequest(url, options = {}) {
@@ -16,6 +32,11 @@ class APIClient {
         'Content-Type': 'application/json',
       }
     };
+
+    // Add cart token to headers if available
+    if (this.cartToken) {
+      defaultOptions.headers['Authorization'] = `Bearer ${this.cartToken}`;
+    }
 
     const csrfToken = this.getCookie('csrftoken');
     if (csrfToken && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(options.method)) {
@@ -37,7 +58,16 @@ class APIClient {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+
+      // Update cart token if present in response
+      if (data.token) {
+        this.setCartToken(data.token);
+      } else if (data.cart_token) {
+        this.setCartToken(data.cart_token);
+      }
+
+      return data;
     } catch (error) {
       console.error('API Error:', error);
       throw error;
@@ -83,7 +113,14 @@ class APIClient {
 
   // Cart API methods
   async getCart() {
-    return await this.makeRequest(window.API_ENDPOINTS.cart);
+    const response = await this.makeRequest(window.API_ENDPOINTS.cart);
+
+    // Store token if returned
+    if (response.token) {
+      this.setCartToken(response.token);
+    }
+
+    return response;
   }
 
   async addToCart(productSlugOrId, quantity = 1, variantId = null) {
@@ -110,10 +147,17 @@ class APIClient {
 
     console.log('Adding to cart with data:', data);
 
-    return await this.makeRequest(window.API_ENDPOINTS.cartItems, {
+    const response = await this.makeRequest(window.API_ENDPOINTS.cartItems, {
       method: 'POST',
       body: JSON.stringify(data)
     });
+
+    // Store token if returned
+    if (response.cart_token) {
+      this.setCartToken(response.cart_token);
+    }
+
+    return response;
   }
 
   async updateCartItem(itemId, quantity) {

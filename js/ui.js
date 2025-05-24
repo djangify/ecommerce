@@ -108,8 +108,16 @@ class UIManager {
     const regularPrice = product.price;
     const isOnSale = salePrice && salePrice < regularPrice;
 
+    // Ensure we have a valid product ID
+    const productId = product.id || product.pk;  // Some APIs use 'pk' instead of 'id'
+    const productSlug = product.slug;
+
+    if (!productId) {
+      console.error('Product missing ID:', product);
+    }
+
     return `
-      <div class="group product-item" data-product-id="${product.id}" data-product-slug="${product.slug}">
+      <div class="group product-item" data-product-id="${productId}" data-product-slug="${productSlug}">
         <div class="aspect-square bg-slate-100 rounded-lg mb-4 relative border-2 border-dashed border-slate-300">
           <!-- NO IMAGES - JUST PRODUCT INFO -->
           <div class="w-full h-full flex flex-col items-center justify-center text-center p-4">
@@ -123,7 +131,7 @@ class UIManager {
           <div class="absolute top-3 right-3">
             <button 
               class="w-8 h-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-slate-50 wishlist-btn"
-              onclick="window.cartManager.toggleWishlist('${product.id}')"
+              onclick="window.cartManager.toggleWishlist('${productId}')"
               title="Add to Wishlist"
             >
               <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +142,7 @@ class UIManager {
           ${isOnSale ? '<div class="absolute top-3 left-3 bg-red-500 text-white px-2 py-1 text-xs font-semibold rounded">SALE</div>' : ''}
         </div>
         
-        <a href="product.html?slug=${product.slug}" class="block">
+        <a href="product.html?slug=${productSlug}" class="block">
           <h3 class="font-medium text-slate-900 mb-1 group-hover:text-teal-600 transition-colors">${product.name}</h3>
           <p class="text-sm text-slate-600 mb-2">${product.category?.name || 'Uncategorized'}</p>
           <div class="flex items-center gap-2">
@@ -148,11 +156,12 @@ class UIManager {
         
         <button 
           class="w-full mt-3 bg-slate-900 text-white py-2 px-4 rounded-md hover:bg-slate-800 transition-colors add-to-cart-btn"
-          onclick="window.cartManager.addToCart('${product.id}', 1)"
+          onclick="window.cartManager.addToCart('${productId}', 1)"
           ${!product.in_stock ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}
         >
           ${product.in_stock ? 'Add to Cart' : 'Out of Stock'}
         </button>
+        
       </div>
     `;
   }

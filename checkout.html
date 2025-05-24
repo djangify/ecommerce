@@ -1,9 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- ============================================ -->
-    <!-- HEAD SECTION - Copy this to all pages -->
-    <!-- ============================================ -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Checkout - Your Store Name</title>
@@ -11,9 +8,6 @@
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- HTMX -->
-    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     
     <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
@@ -23,9 +17,7 @@
 </head>
 
 <body class="bg-slate-50 text-slate-900">
-    <!-- ============================================ -->
     <!-- NAVIGATION - Simplified for checkout -->
-    <!-- ============================================ -->
     <header class="bg-white border-b border-slate-200">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -36,24 +28,6 @@
                         <span class="text-white font-bold text-lg">S</span>
                     </div>
                     <span class="text-xl font-semibold text-slate-900">Store Name</span>
-                </div>
-
-                <!-- Checkout Progress -->
-                <div class="hidden md:flex items-center space-x-4">
-                    <div class="flex items-center text-sm">
-                        <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center font-semibold mr-2">1</div>
-                        <span class="text-teal-600 font-medium">Cart</span>
-                    </div>
-                    <div class="w-8 border-t border-slate-300"></div>
-                    <div class="flex items-center text-sm">
-                        <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center font-semibold mr-2">2</div>
-                        <span class="text-teal-600 font-medium">Checkout</span>
-                    </div>
-                    <div class="w-8 border-t border-slate-300"></div>
-                    <div class="flex items-center text-sm">
-                        <div class="w-8 h-8 bg-slate-300 text-slate-600 rounded-full flex items-center justify-center font-semibold mr-2">3</div>
-                        <span class="text-slate-500">Complete</span>
-                    </div>
                 </div>
 
                 <!-- Secure Badge -->
@@ -67,405 +41,151 @@
         </nav>
     </header>
 
-    <!-- ============================================ -->
-    <!-- PAGE CONTENT - Checkout Form -->
-    <!-- ============================================ -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- PAGE CONTENT - Simplified Checkout -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <h1 class="text-3xl font-bold text-slate-900 mb-8 text-center">Complete Your Order</h1>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
-            <!-- Checkout Form (Left Side) -->
-            <div class="lg:col-span-2 space-y-8">
+            <!-- Order Summary (Left Side) -->
+            <div class="bg-white rounded-lg p-6 shadow-sm">
+                <h2 class="text-xl font-semibold text-slate-900 mb-6">Order Summary</h2>
                 
-                <!-- Contact Information -->
-                <div class="bg-white rounded-lg p-6 shadow-sm">
-                    <h2 class="text-xl font-semibold text-slate-900 mb-6">Contact Information</h2>
-                    
-                    <form id="checkout-form" class="space-y-6">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">First Name *</label>
-                                <input 
-                                    type="text" 
-                                    name="first_name"
-                                    required
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">Last Name *</label>
-                                <input 
-                                    type="text" 
-                                    name="last_name"
-                                    required
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                                >
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Email Address *</label>
-                            <input 
-                                type="email" 
-                                name="email"
-                                required
-                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                            >
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Phone Number</label>
-                            <input 
-                                type="tel" 
-                                name="phone"
-                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                            >
-                        </div>
-                    </form>
+                <!-- Loading State -->
+                <div id="order-summary-loading" class="text-center py-6">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto"></div>
+                    <p class="mt-2 text-sm text-slate-600">Loading order details...</p>
                 </div>
 
-                <!-- Shipping Address -->
-                <div class="bg-white rounded-lg p-6 shadow-sm">
-                    <h2 class="text-xl font-semibold text-slate-900 mb-6">Shipping Address</h2>
-                    
-                    <div class="space-y-6">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Street Address *</label>
-                            <input 
-                                type="text" 
-                                name="shipping_address_line1"
-                                required
-                                placeholder="123 Main Street"
-                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                            >
+                <!-- Order Items -->
+                <div id="order-summary-content" style="display: none;">
+                    <div id="order-items" class="space-y-4 mb-6 max-h-96 overflow-y-auto">
+                        <!-- Items will be loaded here dynamically -->
+                    </div>
+
+                    <!-- Price Breakdown -->
+                    <div class="space-y-3 border-t pt-4">
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Subtotal</span>
+                            <span class="font-medium text-slate-900" id="order-subtotal">$0.00</span>
                         </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Apartment, suite, etc. (optional)</label>
-                            <input 
-                                type="text" 
-                                name="shipping_address_line2"
-                                placeholder="Apartment, suite, unit, building, floor, etc."
-                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                            >
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Shipping</span>
+                            <span class="font-medium text-slate-900" id="shipping-cost">TBD</span>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">City *</label>
-                                <input 
-                                    type="text" 
-                                    name="shipping_city"
-                                    required
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">State *</label>
-                                <select 
-                                    name="shipping_state"
-                                    required
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                                >
-                                    <option value="">Select State</option>
-                                    <option value="AL">Alabama</option>
-                                    <option value="CA">California</option>
-                                    <option value="FL">Florida</option>
-                                    <option value="NY">New York</option>
-                                    <option value="TX">Texas</option>
-                                    <!-- Add more states as needed -->
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">ZIP Code *</label>
-                                <input 
-                                    type="text" 
-                                    name="shipping_zip"
-                                    required
-                                    placeholder="12345"
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                                >
-                            </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-600">Tax</span>
+                            <span class="font-medium text-slate-900" id="order-tax">TBD</span>
                         </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Country *</label>
-                            <select 
-                                name="shipping_country"
-                                required
-                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                            >
-                                <option value="US">United States</option>
-                                <option value="CA">Canada</option>
-                                <option value="GB">United Kingdom</option>
-                                <!-- Add more countries as needed -->
-                            </select>
+                        <div class="border-t border-slate-200 pt-3">
+                            <div class="flex justify-between">
+                                <span class="text-lg font-semibold text-slate-900">Estimated Total</span>
+                                <span class="text-lg font-bold text-slate-900" id="total-cost">$0.00</span>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-2">Final shipping & tax calculated at payment</p>
                         </div>
                     </div>
                 </div>
 
-                <!-- Billing Address -->
-                <div class="bg-white rounded-lg p-6 shadow-sm">
-                    <div class="flex items-center justify-between mb-6">
-                        <h2 class="text-xl font-semibold text-slate-900">Billing Address</h2>
-                        <label class="flex items-center">
-                            <input 
-                                type="checkbox" 
-                                id="same-as-shipping"
-                                checked
-                                onchange="toggleBillingAddress()"
-                                class="rounded border-slate-300 text-teal-600 focus:ring-teal-500 mr-2"
-                            >
-                            <span class="text-sm text-slate-700">Same as shipping address</span>
-                        </label>
+                <!-- Empty Cart Message -->
+                <div id="empty-cart-message" class="text-center py-6" style="display: none;">
+                    <div class="w-16 h-16 bg-slate-100 rounded-full mx-auto flex items-center justify-center mb-4">
+                        <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+                        </svg>
                     </div>
-                    
-                    <div id="billing-address-fields" class="hidden space-y-6">
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Street Address *</label>
-                            <input 
-                                type="text" 
-                                name="billing_address_line1"
-                                placeholder="123 Main Street"
-                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                            >
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-slate-700 mb-2">Apartment, suite, etc. (optional)</label>
-                            <input 
-                                type="text" 
-                                name="billing_address_line2"
-                                placeholder="Apartment, suite, unit, building, floor, etc."
-                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                            >
-                        </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">City *</label>
-                                <input 
-                                    type="text" 
-                                    name="billing_city"
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                                >
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">State *</label>
-                                <select 
-                                    name="billing_state"
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                                >
-                                    <option value="">Select State</option>
-                                    <option value="AL">Alabama</option>
-                                    <option value="CA">California</option>
-                                    <option value="FL">Florida</option>
-                                    <option value="NY">New York</option>
-                                    <option value="TX">Texas</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-2">ZIP Code *</label>
-                                <input 
-                                    type="text" 
-                                    name="billing_zip"
-                                    placeholder="12345"
-                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                                >
-                            </div>
-                        </div>
-                    </div>
+                    <p class="text-slate-600 mb-4">Your cart is empty</p>
+                    <a href="index.html" class="text-teal-600 hover:text-teal-700 font-medium">Return to Shop</a>
                 </div>
-
-                <!-- Shipping Method -->
-                <div class="bg-white rounded-lg p-6 shadow-sm">
-                    <h2 class="text-xl font-semibold text-slate-900 mb-6">Shipping Method</h2>
-                    
-                    <div class="space-y-4">
-                        <label class="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:border-teal-500 cursor-pointer">
-                            <div class="flex items-center">
-                                <input type="radio" name="shipping_method" value="standard" checked onchange="updateShippingCost()" class="text-teal-600 focus:ring-teal-500 mr-3">
-                                <div>
-                                    <p class="font-medium text-slate-900">Standard Shipping</p>
-                                    <p class="text-sm text-slate-600">5-7 business days</p>
-                                </div>
-                            </div>
-                            <span class="font-semibold text-slate-900">$5.99</span>
-                        </label>
-                        
-                        <label class="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:border-teal-500 cursor-pointer">
-                            <div class="flex items-center">
-                                <input type="radio" name="shipping_method" value="express" onchange="updateShippingCost()" class="text-teal-600 focus:ring-teal-500 mr-3">
-                                <div>
-                                    <p class="font-medium text-slate-900">Express Shipping</p>
-                                    <p class="text-sm text-slate-600">2-3 business days</p>
-                                </div>
-                            </div>
-                            <span class="font-semibold text-slate-900">$15.99</span>
-                        </label>
-                        
-                        <label class="flex items-center justify-between p-4 border border-slate-200 rounded-lg hover:border-teal-500 cursor-pointer">
-                            <div class="flex items-center">
-                                <input type="radio" name="shipping_method" value="overnight" onchange="updateShippingCost()" class="text-teal-600 focus:ring-teal-500 mr-3">
-                                <div>
-                                    <p class="font-medium text-slate-900">Overnight Shipping</p>
-                                    <p class="text-sm text-slate-600">Next business day</p>
-                                </div>
-                            </div>
-                            <span class="font-semibold text-slate-900">$29.99</span>
-                        </label>
-                    </div>
-                </div>
-                <!-- Payment Method -->
-                <div class="bg-white rounded-lg p-6 shadow-sm">
-                    <h2 class="text-xl font-semibold text-slate-900 mb-6">Payment Method</h2>
-                    
-                    <div class="space-y-4">
-                        <p class="text-sm text-slate-600 mb-4">
-                            Select your preferred payment method. You'll be redirected to a secure payment page to complete your purchase.
-                        </p>
-                        
-                        <!-- Payment Options -->
-                        <div class="space-y-3">
-                            <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:border-teal-500 cursor-pointer transition-colors">
-                                <input type="radio" name="payment_method" value="stripe" checked class="text-teal-600 focus:ring-teal-500 mr-3">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="font-medium text-slate-900">Credit/Debit Card</span>
-                                        <div class="flex gap-1">
-                                            <div class="w-8 h-5 bg-slate-200 rounded text-xs flex items-center justify-center font-bold text-slate-600">VISA</div>
-                                            <div class="w-8 h-5 bg-slate-200 rounded text-xs flex items-center justify-center font-bold text-slate-600">MC</div>
-                                            <div class="w-8 h-5 bg-slate-200 rounded text-xs flex items-center justify-center font-bold text-slate-600">AMEX</div>
-                                        </div>
-                                    </div>
-                                    <p class="text-xs text-slate-500">Secure payment via Stripe</p>
-                                </div>
-                            </label>
-                            
-                            <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:border-teal-500 cursor-pointer transition-colors">
-                                <input type="radio" name="payment_method" value="paypal" class="text-teal-600 focus:ring-teal-500 mr-3">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="font-medium text-slate-900">PayPal</span>
-                                        <div class="w-16 h-5 bg-blue-600 rounded text-xs flex items-center justify-center font-bold text-white">PayPal</div>
-                                    </div>
-                                    <p class="text-xs text-slate-500">Pay with your PayPal account</p>
-                                </div>
-                            </label>
-                        </div>
-
-                        <!-- Security Notice -->
-                        <div class="mt-4 p-3 bg-blue-50 rounded-lg">
-                            <div class="flex items-start gap-2">
-                                <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <div class="text-xs text-blue-800">
-                                    <p class="font-medium mb-1">Secure Payment Processing</p>
-                                    <p>Your payment information is never stored on our servers. All transactions are processed securely through our payment partners.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Order Notes -->
-                <div class="bg-white rounded-lg p-6 shadow-sm">
-                    <h2 class="text-xl font-semibold text-slate-900 mb-6">Order Notes (Optional)</h2>
-                    <textarea 
-                        name="order_notes"
-                        rows="4"
-                        placeholder="Special instructions, delivery notes, etc."
-                        class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
-                    ></textarea>
-                </div>
-
             </div>
 
-            <!-- Order Summary (Right Side) -->
-            <div class="lg:col-span-1">
-                <div class="bg-white rounded-lg p-6 shadow-sm sticky top-8">
-                    <h2 class="text-xl font-semibold text-slate-900 mb-6">Order Summary</h2>
-                    
-                    <!-- Loading State -->
-                    <div id="order-summary-loading" class="text-center py-6">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto"></div>
-                        <p class="mt-2 text-sm text-slate-600">Loading order details...</p>
+            <!-- Payment Options (Right Side) -->
+            <div class="bg-white rounded-lg p-6 shadow-sm">
+                <h2 class="text-xl font-semibold text-slate-900 mb-6">Payment Method</h2>
+                
+                <form id="checkout-form" class="space-y-6">
+                    <!-- Email for guest checkout -->
+                    <div id="guest-email-section" style="display: none;">
+                        <label class="block text-sm font-medium text-slate-700 mb-2">Email Address *</label>
+                        <input 
+                            type="email" 
+                            name="email"
+                            id="guest-email"
+                            placeholder="your@email.com"
+                            class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                        >
+                        <p class="text-xs text-slate-500 mt-1">We'll send order confirmation to this email</p>
                     </div>
 
-                    <!-- Order Summary Content (hidden initially) -->
-                    <div id="order-summary-content" style="display: none;">
-                        <!-- Order Items -->
-                        <div id="order-items" class="space-y-4 mb-6">
-                            <!-- Items will be loaded here dynamically -->
-                        </div>
-
-                        <!-- Price Breakdown -->
-                        <div class="space-y-3 mb-6">
-                            <div class="flex justify-between">
-                                <span class="text-slate-600">Subtotal</span>
-                                <span class="font-medium text-slate-900" id="order-subtotal">$0.00</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-600">Shipping</span>
-                                <span class="font-medium text-slate-900" id="shipping-cost">$5.99</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-slate-600">Tax</span>
-                                <span class="font-medium text-slate-900" id="order-tax">$0.00</span>
-                            </div>
-                            <div class="flex justify-between" id="discount-row" style="display: none;">
-                                <span class="text-slate-600">Discount</span>
-                                <span class="font-medium text-green-600" id="order-discount">-$0.00</span>
-                            </div>
-                            <div class="border-t border-slate-200 pt-3">
-                                <div class="flex justify-between">
-                                    <span class="text-lg font-semibold text-slate-900">Total</span>
-                                    <span class="text-lg font-bold text-slate-900" id="total-cost">$0.00</span>
+                    <!-- Payment Method Selection -->
+                    <div class="space-y-3">
+                        <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:border-teal-500 cursor-pointer transition-colors">
+                            <input type="radio" name="payment_method" value="stripe" checked class="text-teal-600 focus:ring-teal-500 mr-3">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-medium text-slate-900">Credit/Debit Card</span>
+                                    <div class="flex gap-1">
+                                        <div class="w-8 h-5 bg-slate-200 rounded text-xs flex items-center justify-center font-bold text-slate-600">VISA</div>
+                                        <div class="w-8 h-5 bg-slate-200 rounded text-xs flex items-center justify-center font-bold text-slate-600">MC</div>
+                                        <div class="w-8 h-5 bg-slate-200 rounded text-xs flex items-center justify-center font-bold text-slate-600">AMEX</div>
+                                    </div>
                                 </div>
+                                <p class="text-xs text-slate-500">Secure payment via Stripe</p>
                             </div>
-                        </div>
+                        </label>
+                        
+                        <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:border-teal-500 cursor-pointer transition-colors">
+                            <input type="radio" name="payment_method" value="paypal" class="text-teal-600 focus:ring-teal-500 mr-3">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1">
+                                    <span class="font-medium text-slate-900">PayPal</span>
+                                    <div class="w-16 h-5 bg-blue-600 rounded text-xs flex items-center justify-center font-bold text-white">PayPal</div>
+                                </div>
+                                <p class="text-xs text-slate-500">Pay with your PayPal account</p>
+                            </div>
+                        </label>
+                    </div>
 
-                        <!-- Place Order Button -->
-                        <button 
-                            onclick="placeOrder()"
-                            class="w-full bg-slate-900 text-white py-3 px-6 rounded-md font-semibold hover:bg-slate-800 transition-colors mb-4"
-                            id="place-order-btn"
-                            disabled
-                        >
-                            Place Order
-                        </button>
+                    <!-- Continue to Payment Button -->
+                    <button 
+                        type="button"
+                        onclick="proceedToPayment()"
+                        class="w-full bg-slate-900 text-white py-3 px-6 rounded-md font-semibold hover:bg-slate-800 transition-colors"
+                        id="proceed-to-payment-btn"
+                        disabled
+                    >
+                        Continue to Payment
+                    </button>
 
-                        <!-- Security Notice -->
-                        <div class="flex items-start gap-3 p-3 bg-green-50 rounded-lg">
+                    <!-- Security Notice -->
+                    <div class="mt-4 p-3 bg-green-50 rounded-lg">
+                        <div class="flex items-start gap-2">
                             <svg class="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.031 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
                             </svg>
-                            <div>
-                                <p class="text-sm font-medium text-green-800">Secure Payment</p>
-                                <p class="text-xs text-green-700">Your payment information is protected with 256-bit SSL encryption</p>
+                            <div class="text-xs text-green-800">
+                                <p class="font-medium mb-1">Secure Payment Processing</p>
+                                <p>You'll be redirected to our secure payment partner to complete your purchase. Shipping address and payment details are collected securely by Stripe or PayPal.</p>
                             </div>
                         </div>
-
-                        <!-- Terms -->
-                        <div class="mt-4 text-xs text-slate-500 text-center">
-                            By placing your order, you agree to our 
-                            <a href="terms.html" class="text-teal-600 hover:underline">Terms of Service</a> and 
-                            <a href="privacy.html" class="text-teal-600 hover:underline">Privacy Policy</a>
-                        </div>
                     </div>
 
-                    <!-- Empty Cart Message (hidden initially) -->
-                    <div id="empty-cart-message" class="text-center py-6" style="display: none;">
-                        <div class="w-16 h-16 bg-slate-100 rounded-full mx-auto flex items-center justify-center mb-4">
-                            <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
-                            </svg>
-                        </div>
-                        <p class="text-slate-600 mb-4">Your cart is empty</p>
-                        <a href="index.html" class="text-teal-600 hover:text-teal-700 font-medium">Return to Shop</a>
+                    <!-- Terms -->
+                    <div class="text-xs text-slate-500 text-center">
+                        By proceeding to payment, you agree to our 
+                        <a href="terms.html" class="text-teal-600 hover:underline">Terms of Service</a> and 
+                        <a href="privacy.html" class="text-teal-600 hover:underline">Privacy Policy</a>
                     </div>
-                </div>
+                </form>
             </div>
+        </div>
+
+        <!-- Back to Cart -->
+        <div class="mt-8 text-center">
+            <a href="cart.html" class="text-slate-600 hover:text-teal-600 font-medium">
+                ← Back to Cart
+            </a>
         </div>
 
     </main>
@@ -483,9 +203,7 @@
         let cartData = null;
         let currentTotals = {
             subtotal: 0,
-            shipping: 5.99,
             tax: 0,
-            discount: 0,
             total: 0
         };
 
@@ -510,17 +228,28 @@
                 // Calculate and display totals
                 updateOrderTotals();
                 
+                // Show guest email field if not logged in
+                if (!isUserLoggedIn()) {
+                    document.getElementById('guest-email-section').style.display = 'block';
+                    document.getElementById('guest-email').required = true;
+                }
+                
                 // Show the order summary content
                 document.getElementById('order-summary-loading').style.display = 'none';
                 document.getElementById('order-summary-content').style.display = 'block';
                 
-                // Enable place order button
-                document.getElementById('place-order-btn').disabled = false;
+                // Enable proceed button
+                document.getElementById('proceed-to-payment-btn').disabled = false;
                 
             } catch (error) {
                 console.error('Error loading checkout data:', error);
                 window.ui.showMessage('Failed to load order details. Please try again.', 'error');
             }
+        }
+
+        function isUserLoggedIn() {
+            // Check if user is logged in (you may need to adjust this based on your auth system)
+            return false; // For now, assume guest checkout
         }
 
         function showEmptyCart() {
@@ -561,141 +290,61 @@
             // Calculate subtotal from cart
             currentTotals.subtotal = parseFloat(cartData.subtotal || 0);
             
-            // Get selected shipping method
-            const shippingMethod = document.querySelector('input[name="shipping_method"]:checked').value;
-            if (shippingMethod === 'standard') {
-                currentTotals.shipping = 5.99;
-            } else if (shippingMethod === 'express') {
-                currentTotals.shipping = 15.99;
-            } else if (shippingMethod === 'overnight') {
-                currentTotals.shipping = 29.99;
-            }
-            
-            // Free shipping over $50
-            if (currentTotals.subtotal > 50) {
-                currentTotals.shipping = 0;
-            }
-            
-            // Calculate tax (10%)
-            currentTotals.tax = currentTotals.subtotal * 0.1;
-            
-            // Calculate total
-            currentTotals.total = currentTotals.subtotal + currentTotals.shipping + currentTotals.tax - currentTotals.discount;
+            // For estimated total, we'll just show subtotal
+            // Actual shipping and tax will be calculated by payment provider
+            currentTotals.total = currentTotals.subtotal;
             
             // Update display
             document.getElementById('order-subtotal').textContent = `$${currentTotals.subtotal.toFixed(2)}`;
-            document.getElementById('shipping-cost').textContent = currentTotals.shipping === 0 ? 'FREE' : `$${currentTotals.shipping.toFixed(2)}`;
-            document.getElementById('order-tax').textContent = `$${currentTotals.tax.toFixed(2)}`;
             document.getElementById('total-cost').textContent = `$${currentTotals.total.toFixed(2)}`;
-            
-            // Update discount if applicable
-            if (currentTotals.discount > 0) {
-                document.getElementById('discount-row').style.display = 'flex';
-                document.getElementById('order-discount').textContent = `-$${currentTotals.discount.toFixed(2)}`;
-            } else {
-                document.getElementById('discount-row').style.display = 'none';
-            }
         }
 
-        function updateShippingCost() {
-            updateOrderTotals();
-        }
-
-        function toggleBillingAddress() {
-            const checkbox = document.getElementById('same-as-shipping');
-            const billingFields = document.getElementById('billing-address-fields');
-            
-            if (checkbox.checked) {
-                billingFields.classList.add('hidden');
-                // Clear required attributes from billing fields
-                billingFields.querySelectorAll('input[required], select[required]').forEach(field => {
-                    field.removeAttribute('required');
-                });
-            } else {
-                billingFields.classList.remove('hidden');
-                // Add required attributes to billing fields
-                billingFields.querySelector('[name="billing_address_line1"]').setAttribute('required', '');
-                billingFields.querySelector('[name="billing_city"]').setAttribute('required', '');
-                billingFields.querySelector('[name="billing_state"]').setAttribute('required', '');
-                billingFields.querySelector('[name="billing_zip"]').setAttribute('required', '');
-            }
-        }
-
-        async function placeOrder() {
-            // Validate form
+        async function proceedToPayment() {
             const form = document.getElementById('checkout-form');
-            if (!form.checkValidity()) {
-                form.reportValidity();
-                return;
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            
+            // Validate guest email if needed
+            if (!isUserLoggedIn()) {
+                const email = document.getElementById('guest-email').value;
+                if (!email) {
+                    window.ui.showMessage('Please enter your email address', 'error');
+                    return;
+                }
             }
-            
-            // Get form data
-            const formData = new FormData(form);
-            const orderData = {
-                // Contact info
-                first_name: formData.get('first_name'),
-                last_name: formData.get('last_name'),
-                email: formData.get('email'),
-                phone: formData.get('phone'),
-                
-                // Shipping address
-                shipping_address: {
-                    full_name: `${formData.get('first_name')} ${formData.get('last_name')}`,
-                    address_line1: document.querySelector('[name="shipping_address_line1"]').value,
-                    address_line2: document.querySelector('[name="shipping_address_line2"]').value,
-                    city: document.querySelector('[name="shipping_city"]').value,
-                    state_province: document.querySelector('[name="shipping_state"]').value,
-                    postal_code: document.querySelector('[name="shipping_zip"]').value,
-                    country: document.querySelector('[name="shipping_country"]').value,
-                    phone: formData.get('phone')
-                },
-                
-                // Shipping method
-                shipping_method: document.querySelector('input[name="shipping_method"]:checked').value,
-                
-                // Payment method
-                payment_method: document.querySelector('input[name="payment_method"]:checked').value,
-                
-                // Order notes
-                notes: document.querySelector('[name="order_notes"]').value
-            };
-            
-            // Add billing address if different from shipping
-            const sameAsShipping = document.getElementById('same-as-shipping').checked;
-            if (!sameAsShipping) {
-                orderData.billing_address = {
-                    full_name: `${formData.get('first_name')} ${formData.get('last_name')}`,
-                    address_line1: document.querySelector('[name="billing_address_line1"]').value,
-                    address_line2: document.querySelector('[name="billing_address_line2"]').value,
-                    city: document.querySelector('[name="billing_city"]').value,
-                    state_province: document.querySelector('[name="billing_state"]').value,
-                    postal_code: document.querySelector('[name="billing_zip"]').value,
-                    country: document.querySelector('[name="shipping_country"]').value,
-                    phone: formData.get('phone')
-                };
-            } else {
-                orderData.billing_address = orderData.shipping_address;
-            }
-            
-            console.log('Placing order with data:', orderData);
             
             try {
                 window.ui.showLoading();
                 
-                // TODO: Call checkout API endpoint to create order
-                // const response = await window.api.createOrder(orderData);
+                // Prepare order data
+                const orderData = {
+                    payment_method: paymentMethod,
+                    cart_token: window.api.getCartToken(),
+                    email: document.getElementById('guest-email')?.value || null,
+                    total: currentTotals.total,
+                    items: cartData.items
+                };
                 
-                // For now, show success message and redirect
-                window.ui.showMessage('Order placed successfully!', 'success');
+                // Create payment session with backend
+                // This should return a Stripe/PayPal session URL
+                // const response = await window.api.createPaymentSession(orderData);
                 
-                // Redirect to order confirmation page
+                // For now, simulate redirect to payment provider
+                window.ui.showMessage('Redirecting to secure payment...', 'success');
+                
+                // Simulate payment provider redirect
                 setTimeout(() => {
-                    window.location.href = 'order-confirmation.html?order=ORD-2024-' + Math.floor(Math.random() * 100000);
+                    if (paymentMethod === 'stripe') {
+                        // In production, this would be: window.location.href = response.sessionUrl;
+                        console.log('Would redirect to Stripe with order data:', orderData);
+                    } else if (paymentMethod === 'paypal') {
+                        // In production, this would be: window.location.href = response.approvalUrl;
+                        console.log('Would redirect to PayPal with order data:', orderData);
+                    }
                 }, 2000);
                 
             } catch (error) {
-                console.error('Error placing order:', error);
-                window.ui.showMessage('Failed to place order. Please try again.', 'error');
+                console.error('Error proceeding to payment:', error);
+                window.ui.showMessage('Failed to process payment. Please try again.', 'error');
             } finally {
                 window.ui.hideLoading();
             }
