@@ -9,7 +9,7 @@ class APIClient {
     this.cartToken = this.getCartToken();
   }
 
-  // Cart token management
+  // Cart token management (JWT tokens)
   getCartToken() {
     return localStorage.getItem('cart_token');
   }
@@ -33,8 +33,8 @@ class APIClient {
       }
     };
 
-    // Add cart token to headers if available
-    if (this.cartToken) {
+    // Add cart token to headers if available (for cart operations)
+    if (this.cartToken && url.includes('/cart')) {
       defaultOptions.headers['Authorization'] = `Bearer ${this.cartToken}`;
     }
 
@@ -63,8 +63,6 @@ class APIClient {
       // Update cart token if present in response
       if (data.token) {
         this.setCartToken(data.token);
-      } else if (data.cart_token) {
-        this.setCartToken(data.cart_token);
       }
 
       return data;
@@ -111,7 +109,7 @@ class APIClient {
     return await this.makeRequest(window.API_ENDPOINTS.categories);
   }
 
-  // Cart API methods
+  // Cart API methods (JWT token based)
   async getCart() {
     const response = await this.makeRequest(window.API_ENDPOINTS.cart);
 
@@ -123,29 +121,20 @@ class APIClient {
     return response;
   }
 
-  async addToCart(productSlugOrId, quantity = 1, variantId = null) {
-    // If productSlugOrId is a string (slug), we need to get the product ID first
-    let productId = productSlugOrId;
+  async addToCart(productId, quantity = 1, variantId = null) {
+    // Convert productId to integer if it's a string
+    const numericProductId = parseInt(productId);
 
-    // Check if it's a UUID (has dashes in UUID format) or a slug
-    const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productSlugOrId);
-
-    if (!isUUID && typeof productSlugOrId === 'string') {
-      console.log('Converting product slug to ID:', productSlugOrId);
-      try {
-        const product = await this.getProduct(productSlugOrId);
-        productId = product.id;
-        console.log('Product ID found:', productId);
-      } catch (error) {
-        console.error('Failed to get product by slug:', error);
-        throw new Error('Product not found');
-      }
+    if (isNaN(numericProductId)) {
+      throw new Error('Invalid product ID');
     }
 
-    const data = { product: productId, quantity };
-    if (variantId) data.variant = variantId;
+    console.log('Adding to cart:', { productId: numericProductId, quantity, variantId });
 
-    console.log('Adding to cart with data:', data);
+    const data = { product: numericProductId, quantity };
+    if (variantId) {
+      data.variant = parseInt(variantId);
+    }
 
     const response = await this.makeRequest(window.API_ENDPOINTS.cartItems, {
       method: 'POST',
@@ -153,8 +142,8 @@ class APIClient {
     });
 
     // Store token if returned
-    if (response.cart_token) {
-      this.setCartToken(response.cart_token);
+    if (response.token) {
+      this.setCartToken(response.token);
     }
 
     return response;
@@ -163,7 +152,7 @@ class APIClient {
   async updateCartItem(itemId, quantity) {
     return await this.makeRequest(`${window.API_ENDPOINTS.cartItems}${itemId}/`, {
       method: 'PUT',
-      body: JSON.stringify({ quantity })
+      body: JSON.stringify({ quantity: parseInt(quantity) })
     });
   }
 
@@ -173,24 +162,24 @@ class APIClient {
     });
   }
 
-  // Wishlist API methods
-  async addToWishlist(productSlugOrId) {
-    // If productSlugOrId is a string (slug), we need to get the product ID first
-    let productId = productSlugOrId;
+  async clearCart() {
+    return await this.makeRequest(`${window.API_ENDPOINTS.cart}clear/`, {
+      method: 'POST'
+    });
+  }
 
-    if (typeof productSlugOrId === 'string') {
-      try {
-        const product = await this.getProduct(productSlugOrId);
-        productId = product.id;
-      } catch (error) {
-        console.error('Failed to get product by slug for wishlist:', error);
-        throw new Error('Product not found');
-      }
+  // Wishlist API methods
+  async addToWishlist(productId) {
+    // Convert productId to integer
+    const numericProductId = parseInt(productId);
+
+    if (isNaN(numericProductId)) {
+      throw new Error('Invalid product ID');
     }
 
     return await this.makeRequest(window.API_ENDPOINTS.wishlist, {
       method: 'POST',
-      body: JSON.stringify({ product: productId })
+      body: JSON.stringify({ product: numericProductId })
     });
   }
 }

@@ -17,7 +17,13 @@ class CartManager {
       this.isLoading = true;
       window.ui.showLoading();
 
-      await window.api.addToCart(productId, quantity, variantId);
+      // Convert to integer (no more UUIDs)
+      const numericProductId = parseInt(productId);
+      if (isNaN(numericProductId)) {
+        throw new Error('Invalid product ID');
+      }
+
+      await window.api.addToCart(numericProductId, quantity, variantId);
 
       window.ui.showMessage('Product added to cart!', 'success');
       await this.updateCartCount();
@@ -38,16 +44,22 @@ class CartManager {
       window.ui.updateCartCount(itemCount);
       this.cartData = cart;
 
-      // Ensure token is stored
-      if (cart.token) {
-        window.api.setCartToken(cart.token);
-      }
+      // Token is automatically handled by API client
+      console.log('Cart updated:', {
+        items: itemCount,
+        hasDigital: cart.has_digital_items,
+        hasPhysical: cart.has_physical_items,
+        requiresShipping: cart.requires_shipping
+      });
+
     } catch (error) {
       console.error('Error updating cart count:', error);
-      // If error is related to invalid token, clear it and retry
+
+      // If token is invalid, clear it and retry once
       if (error.message.includes('401') || error.message.includes('403')) {
+        console.log('Invalid cart token, clearing and retrying...');
         window.api.clearCartToken();
-        // Retry once without token
+
         try {
           const cart = await window.api.getCart();
           const itemCount = cart.total_items || 0;
@@ -55,6 +67,7 @@ class CartManager {
           this.cartData = cart;
         } catch (retryError) {
           console.error('Error on retry:', retryError);
+          // Don't show error message for failed cart loads on first visit
         }
       }
     }
@@ -64,7 +77,13 @@ class CartManager {
     console.log('Toggling wishlist for product:', productId);
 
     try {
-      await window.api.addToWishlist(productId);
+      // Convert to integer
+      const numericProductId = parseInt(productId);
+      if (isNaN(numericProductId)) {
+        throw new Error('Invalid product ID');
+      }
+
+      await window.api.addToWishlist(numericProductId);
       window.ui.showMessage('Added to wishlist!', 'success');
     } catch (error) {
       console.error('Error updating wishlist:', error);
@@ -84,11 +103,8 @@ class CartManager {
       window.ui.showMessage('Item removed from cart', 'success');
       await this.updateCartCount();
     } catch (error) {
-      console.error('Error removing from cart - Full error:', error);
-      console.error('Error message:', error.message);
-      console.error('Error status:', error.status);
-      // Comment out the error message for now to stop showing it
-      // window.ui.showMessage('Failed to remove item', 'error');
+      console.error('Error removing from cart:', error);
+      // Don't show error message to user - some operations might fail silently
     } finally {
       window.ui.hideLoading();
     }
@@ -96,11 +112,25 @@ class CartManager {
 
   async updateCartItem(itemId, quantity) {
     try {
-      await window.api.updateCartItem(itemId, quantity);
+      await window.api.updateCartItem(itemId, parseInt(quantity));
       await this.updateCartCount();
     } catch (error) {
       console.error('Error updating cart item:', error);
       window.ui.showMessage('Failed to update quantity', 'error');
+    }
+  }
+
+  async clearCart() {
+    try {
+      window.ui.showLoading();
+      await window.api.clearCart();
+      window.ui.showMessage('Cart cleared', 'success');
+      await this.updateCartCount();
+    } catch (error) {
+      console.error('Error clearing cart:', error);
+      window.ui.showMessage('Failed to clear cart', 'error');
+    } finally {
+      window.ui.hideLoading();
     }
   }
 
@@ -119,32 +149,16 @@ class CartManager {
     }
   }
 
-  async clearCart() {
-    try {
-      window.ui.showLoading();
-
-      // Remove all items individually (since we don't have a clear endpoint)
-      if (this.cartData && this.cartData.items) {
-        for (const item of this.cartData.items) {
-          await window.api.removeFromCart(item.id);
-        }
-      }
-
-      window.ui.showMessage('Cart cleared', 'success');
-      await this.updateCartCount();
-
-    } catch (error) {
-      console.error('Error clearing cart:', error);
-      window.ui.showMessage('Failed to clear cart', 'error');
-    } finally {
-      window.ui.hideLoading();
-    }
-  }
-
   // Calculate cart totals for display
   calculateTotals(cartData) {
     const subtotal = parseFloat(cartData.subtotal || 0);
-    const shipping = subtotal > 50 ? 0 : 5.99; // Free shipping over $50
+
+    // Free shipping logic - consider digital vs physical items
+    let shipping = 0;
+    if (cartData.requires_shipping && subtotal < 50) {
+      shipping = 5.99;
+    }
+
     const tax = subtotal * 0.1; // 10% tax rate
     const discount = 0; // No discount system implemented yet
     const total = subtotal + shipping + tax - discount;
@@ -155,7 +169,9 @@ class CartManager {
       tax: tax.toFixed(2),
       discount: discount.toFixed(2),
       total: total.toFixed(2),
-      itemCount: cartData.total_items || 0
+      itemCount: cartData.total_items || 0,
+      isDigitalOnly: cartData.is_digital_only || false,
+      requiresShipping: cartData.requires_shipping || false
     };
   }
 
@@ -183,8 +199,12 @@ class CartManager {
       return null;
     }
   }
-}
 
+  // Get cart token for checkout
+  getCartToken() {
+    return window.api.getCartToken();
+  }
+}
 
 // Create global cart manager instance
 window.cartManager = new CartManager();

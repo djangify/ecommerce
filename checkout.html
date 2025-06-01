@@ -17,7 +17,9 @@
 </head>
 
 <body class="bg-slate-50 text-slate-900">
+    <!-- ============================================ -->
     <!-- NAVIGATION - Simplified for checkout -->
+    <!-- ============================================ -->
     <header class="bg-white border-b border-slate-200">
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
@@ -28,6 +30,24 @@
                         <span class="text-white font-bold text-lg">S</span>
                     </div>
                     <span class="text-xl font-semibold text-slate-900">Store Name</span>
+                </div>
+
+                <!-- Checkout Progress -->
+                <div class="hidden md:flex items-center space-x-4">
+                    <div class="flex items-center text-sm">
+                        <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center font-semibold mr-2">✓</div>
+                        <span class="text-teal-600 font-medium">Cart</span>
+                    </div>
+                    <div class="w-8 border-t border-teal-600"></div>
+                    <div class="flex items-center text-sm">
+                        <div class="w-8 h-8 bg-teal-600 text-white rounded-full flex items-center justify-center font-semibold mr-2">2</div>
+                        <span class="text-teal-600 font-medium">Checkout</span>
+                    </div>
+                    <div class="w-8 border-t border-slate-300"></div>
+                    <div class="flex items-center text-sm">
+                        <div class="w-8 h-8 bg-slate-300 text-slate-600 rounded-full flex items-center justify-center font-semibold mr-2">3</div>
+                        <span class="text-slate-600">Complete</span>
+                    </div>
                 </div>
 
                 <!-- Secure Badge -->
@@ -41,7 +61,9 @@
         </nav>
     </header>
 
+    <!-- ============================================ -->
     <!-- PAGE CONTENT - Simplified Checkout -->
+    <!-- ============================================ -->
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         
         <h1 class="text-3xl font-bold text-slate-900 mb-8 text-center">Complete Your Order</h1>
@@ -60,6 +82,17 @@
 
                 <!-- Order Items -->
                 <div id="order-summary-content" style="display: none;">
+                    <!-- Order Type Indicator -->
+                    <div id="order-type-indicator" class="mb-4 p-3 rounded-lg border" style="display: none;">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                            </svg>
+                            <span class="text-sm font-medium" id="order-type-text">Digital Downloads Only</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1" id="order-type-description">No shipping required - instant access after payment</p>
+                    </div>
+
                     <div id="order-items" class="space-y-4 mb-6 max-h-96 overflow-y-auto">
                         <!-- Items will be loaded here dynamically -->
                     </div>
@@ -70,7 +103,7 @@
                             <span class="text-slate-600">Subtotal</span>
                             <span class="font-medium text-slate-900" id="order-subtotal">$0.00</span>
                         </div>
-                        <div class="flex justify-between">
+                        <div class="flex justify-between" id="shipping-cost-row">
                             <span class="text-slate-600">Shipping</span>
                             <span class="font-medium text-slate-900" id="shipping-cost">TBD</span>
                         </div>
@@ -83,7 +116,9 @@
                                 <span class="text-lg font-semibold text-slate-900">Estimated Total</span>
                                 <span class="text-lg font-bold text-slate-900" id="total-cost">$0.00</span>
                             </div>
-                            <p class="text-xs text-slate-500 mt-2">Final shipping & tax calculated at payment</p>
+                            <p class="text-xs text-slate-500 mt-2" id="checkout-note">
+                                Final shipping & tax calculated at payment
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -118,8 +153,105 @@
                         <p class="text-xs text-slate-500 mt-1">We'll send order confirmation to this email</p>
                     </div>
 
+                    <!-- Shipping Address Section (Hidden for Digital Only) -->
+                    <div id="shipping-address-section" class="space-y-4" style="display: none;">
+                        <h3 class="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-2">Shipping Address</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">First Name *</label>
+                                <input 
+                                    type="text" 
+                                    name="first_name"
+                                    id="first_name"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">Last Name *</label>
+                                <input 
+                                    type="text" 
+                                    name="last_name"
+                                    id="last_name"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                >
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Address Line 1 *</label>
+                            <input 
+                                type="text" 
+                                name="address_line1"
+                                id="address_line1"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                            >
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Address Line 2</label>
+                            <input 
+                                type="text" 
+                                name="address_line2"
+                                id="address_line2"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                            >
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">City *</label>
+                                <input 
+                                    type="text" 
+                                    name="city"
+                                    id="city"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">State/Province *</label>
+                                <input 
+                                    type="text" 
+                                    name="state"
+                                    id="state"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">ZIP/Postal Code *</label>
+                                <input 
+                                    type="text" 
+                                    name="postal_code"
+                                    id="postal_code"
+                                    class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                                >
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Country *</label>
+                            <select 
+                                name="country"
+                                id="country"
+                                class="w-full px-3 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-teal-500 focus:border-transparent"
+                            >
+                                <option value="">Select Country</option>
+                                <option value="US">United States</option>
+                                <option value="CA">Canada</option>
+                                <option value="GB">United Kingdom</option>
+                                <option value="AU">Australia</option>
+                                <option value="DE">Germany</option>
+                                <option value="FR">France</option>
+                                <option value="IT">Italy</option>
+                                <option value="ES">Spain</option>
+                                <option value="NL">Netherlands</option>
+                                <option value="SE">Sweden</option>
+                                <option value="NO">Norway</option>
+                                <option value="DK">Denmark</option>
+                                <option value="FI">Finland</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <!-- Payment Method Selection -->
                     <div class="space-y-3">
+                        <h3 class="text-lg font-semibold text-slate-900">Choose Payment Method</h3>
+                        
                         <label class="flex items-center p-4 border-2 border-slate-200 rounded-lg hover:border-teal-500 cursor-pointer transition-colors">
                             <input type="radio" name="payment_method" value="stripe" checked class="text-teal-600 focus:ring-teal-500 mr-3">
                             <div class="flex-1">
@@ -166,7 +298,7 @@
                             </svg>
                             <div class="text-xs text-green-800">
                                 <p class="font-medium mb-1">Secure Payment Processing</p>
-                                <p>You'll be redirected to our secure payment partner to complete your purchase. Shipping address and payment details are collected securely by Stripe or PayPal.</p>
+                                <p id="security-notice-text">You'll be redirected to our secure payment partner to complete your purchase. Shipping address and payment details are collected securely by Stripe or PayPal.</p>
                             </div>
                         </div>
                     </div>
@@ -201,6 +333,7 @@
     <script>
         // Checkout-specific variables
         let cartData = null;
+        let cartToken = null;
         let currentTotals = {
             subtotal: 0,
             tax: 0,
@@ -212,6 +345,14 @@
             console.log('Loading checkout data...');
             
             try {
+                // Get cart token from URL parameter or local storage
+                const urlParams = new URLSearchParams(window.location.search);
+                cartToken = urlParams.get('cart_token') || window.api.getCartToken();
+                
+                if (!cartToken) {
+                    console.warn('No cart token found');
+                }
+
                 // Get cart data from API
                 cartData = await window.api.getCart();
                 console.log('Cart data loaded:', cartData);
@@ -227,6 +368,9 @@
                 
                 // Calculate and display totals
                 updateOrderTotals();
+                
+                // Update UI based on cart type
+                updateUIForCartType(cartData);
                 
                 // Show guest email field if not logged in
                 if (!isUserLoggedIn()) {
@@ -264,19 +408,43 @@
             const itemsHTML = items.map(item => {
                 const product = item.product;
                 const variant = item.variant;
+                const imageUrl = getProductImageUrl(product);
                 
                 return `
                     <div class="flex items-center gap-4">
-                        <div class="w-16 h-16 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 border-2 border-dashed border-slate-300">
-                            <div class="w-full h-full flex flex-col items-center justify-center text-center p-1">
-                                <div class="text-xs text-slate-700 font-medium">${product.name}</div>
-                                <div class="text-xs text-slate-500 mt-1">Qty: ${item.quantity}</div>
-                            </div>
+                        <div class="w-16 h-16 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
+                            ${imageUrl ? `
+                                <img 
+                                    src="${imageUrl}" 
+                                    alt="${product.name}"
+                                    class="w-full h-full object-cover"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                >
+                                <div class="w-full h-full flex flex-col items-center justify-center text-center p-1 border-2 border-dashed border-slate-300" style="display: none;">
+                                    <div class="text-xs text-slate-700 font-medium">${product.name}</div>
+                                    <div class="text-xs text-slate-500 mt-1">Qty: ${item.quantity}</div>
+                                </div>
+                            ` : `
+                                <div class="w-full h-full flex flex-col items-center justify-center text-center p-1 border-2 border-dashed border-slate-300">
+                                    <div class="text-xs text-slate-700 font-medium">${product.name}</div>
+                                    <div class="text-xs text-slate-500 mt-1">Qty: ${item.quantity}</div>
+                                </div>
+                            `}
                         </div>
                         <div class="flex-1">
                             <h4 class="font-medium text-slate-900">${product.name}</h4>
                             ${variant ? `<p class="text-sm text-slate-600">${variant.name || 'Variant'}</p>` : ''}
-                            <p class="text-sm font-medium text-slate-900">Qty: ${item.quantity}</p>
+                            <div class="flex items-center gap-2 mt-1">
+                                <p class="text-sm font-medium text-slate-900">Qty: ${item.quantity}</p>
+                                ${product.product_type === 'digital' ? `
+                                    <div class="flex items-center gap-1">
+                                        <svg class="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                                        </svg>
+                                        <span class="text-xs text-blue-600 font-medium">Digital</span>
+                                    </div>
+                                ` : ''}
+                            </div>
                         </div>
                         <span class="font-semibold text-slate-900">$${item.total_price}</span>
                     </div>
@@ -287,30 +455,134 @@
         }
 
         function updateOrderTotals() {
-            // Calculate subtotal from cart
-            currentTotals.subtotal = parseFloat(cartData.subtotal || 0);
+            // Use cart manager's calculation logic
+            const totals = window.cartManager.calculateTotals(cartData);
             
-            // For estimated total, we'll just show subtotal
-            // Actual shipping and tax will be calculated by payment provider
-            currentTotals.total = currentTotals.subtotal;
+            currentTotals.subtotal = parseFloat(totals.subtotal);
+            currentTotals.total = parseFloat(totals.total);
             
             // Update display
-            document.getElementById('order-subtotal').textContent = `$${currentTotals.subtotal.toFixed(2)}`;
-            document.getElementById('total-cost').textContent = `$${currentTotals.total.toFixed(2)}`;
+            document.getElementById('order-subtotal').textContent = `$${totals.subtotal}`;
+            document.getElementById('total-cost').textContent = `$${totals.total}`;
+            
+            // Handle shipping display
+            const shippingRow = document.getElementById('shipping-cost-row');
+            const shippingElement = document.getElementById('shipping-cost');
+            
+            if (cartData.requires_shipping) {
+                shippingRow.style.display = 'flex';
+                shippingElement.textContent = totals.shipping === 'FREE' ? 'FREE' : `$${totals.shipping}`;
+            } else {
+                shippingRow.style.display = 'none';
+            }
+            
+            // Update tax
+            document.getElementById('order-tax').textContent = `$${totals.tax}`;
         }
 
-        async function proceedToPayment() {
+        function updateUIForCartType(cart) {
+            const orderTypeIndicator = document.getElementById('order-type-indicator');
+            const orderTypeText = document.getElementById('order-type-text');
+            const orderTypeDescription = document.getElementById('order-type-description');
+            const shippingAddressSection = document.getElementById('shipping-address-section');
+            const checkoutNote = document.getElementById('checkout-note');
+            const securityNoticeText = document.getElementById('security-notice-text');
+
+            if (cart.is_digital_only) {
+                // Digital only cart
+                orderTypeIndicator.style.display = 'block';
+                orderTypeIndicator.className = 'mb-4 p-3 rounded-lg border border-blue-200 bg-blue-50';
+                orderTypeText.textContent = 'Digital Downloads Only';
+                orderTypeDescription.textContent = 'No shipping required - instant access after payment';
+                
+                // Hide shipping address section
+                shippingAddressSection.style.display = 'none';
+                
+                // Update checkout note
+                checkoutNote.textContent = 'Digital downloads will be available immediately after payment';
+                
+                // Update security notice
+                securityNoticeText.textContent = 'You\'ll be redirected to our secure payment partner. Payment details are collected securely by Stripe or PayPal. Download links will be provided immediately after successful payment.';
+                
+            } else if (cart.has_digital_items && cart.has_physical_items) {
+                // Mixed cart
+                orderTypeIndicator.style.display = 'block';
+                orderTypeIndicator.className = 'mb-4 p-3 rounded-lg border border-purple-200 bg-purple-50';
+                orderTypeText.textContent = 'Mixed Order';
+                orderTypeDescription.textContent = 'Contains both physical and digital items';
+                
+                // Show shipping address section for physical items
+                shippingAddressSection.style.display = 'block';
+                makeShippingFieldsRequired();
+                
+                // Update checkout note
+                checkoutNote.textContent = 'Digital downloads available immediately, physical items will be shipped';
+                
+                // Update security notice
+                securityNoticeText.textContent = 'You\'ll be redirected to our secure payment partner. Shipping address and payment details are collected securely by Stripe or PayPal. Digital downloads will be available immediately after payment.';
+                
+            } else {
+                // Physical items only
+                orderTypeIndicator.style.display = 'none';
+                
+                // Show shipping address section
+                shippingAddressSection.style.display = 'block';
+                makeShippingFieldsRequired();
+                
+                // Update checkout note
+                checkoutNote.textContent = 'Final shipping & tax calculated at payment';
+                
+                // Update security notice
+                securityNoticeText.textContent = 'You\'ll be redirected to our secure payment partner to complete your purchase. Shipping address and payment details are collected securely by Stripe or PayPal.';
+            }
+        }
+
+        function makeShippingFieldsRequired() {
+            const requiredFields = ['first_name', 'last_name', 'address_line1', 'city', 'state', 'postal_code', 'country'];
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    field.required = true;
+                }
+            });
+        }
+
+        function validateCheckoutForm() {
             const form = document.getElementById('checkout-form');
-            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            const formData = new FormData(form);
             
-            // Validate guest email if needed
+            // Validate email if guest checkout
             if (!isUserLoggedIn()) {
                 const email = document.getElementById('guest-email').value;
                 if (!email) {
                     window.ui.showMessage('Please enter your email address', 'error');
-                    return;
+                    return false;
                 }
             }
+            
+            // Validate shipping address if required
+            if (cartData.requires_shipping) {
+                const requiredFields = ['first_name', 'last_name', 'address_line1', 'city', 'state', 'postal_code', 'country'];
+                for (const fieldId of requiredFields) {
+                    const field = document.getElementById(fieldId);
+                    if (field && field.required && !field.value.trim()) {
+                        window.ui.showMessage(`Please fill in ${field.previousElementSibling.textContent.replace(' *', '')}`, 'error');
+                        field.focus();
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+        async function proceedToPayment() {
+            if (!validateCheckoutForm()) {
+                return;
+            }
+
+            const form = document.getElementById('checkout-form');
+            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
             
             try {
                 window.ui.showLoading();
@@ -318,11 +590,27 @@
                 // Prepare order data
                 const orderData = {
                     payment_method: paymentMethod,
-                    cart_token: window.api.getCartToken(),
+                    cart_token: cartToken || window.api.getCartToken(),
                     email: document.getElementById('guest-email')?.value || null,
                     total: currentTotals.total,
-                    items: cartData.items
+                    items: cartData.items,
+                    is_digital_only: cartData.is_digital_only,
+                    requires_shipping: cartData.requires_shipping
                 };
+                
+                // Add shipping address if required
+                if (cartData.requires_shipping) {
+                    orderData.shipping_address = {
+                        first_name: document.getElementById('first_name').value,
+                        last_name: document.getElementById('last_name').value,
+                        address_line1: document.getElementById('address_line1').value,
+                        address_line2: document.getElementById('address_line2').value,
+                        city: document.getElementById('city').value,
+                        state: document.getElementById('state').value,
+                        postal_code: document.getElementById('postal_code').value,
+                        country: document.getElementById('country').value
+                    };
+                }
                 
                 // Create payment session with backend
                 // This should return a Stripe/PayPal session URL
@@ -336,9 +624,13 @@
                     if (paymentMethod === 'stripe') {
                         // In production, this would be: window.location.href = response.sessionUrl;
                         console.log('Would redirect to Stripe with order data:', orderData);
+                        // Simulate successful payment for demo
+                        window.location.href = 'order-confirmation.html?order=ORD-2024-001234';
                     } else if (paymentMethod === 'paypal') {
                         // In production, this would be: window.location.href = response.approvalUrl;
                         console.log('Would redirect to PayPal with order data:', orderData);
+                        // Simulate successful payment for demo
+                        window.location.href = 'order-confirmation.html?order=ORD-2024-001234';
                     }
                 }, 2000);
                 
@@ -348,6 +640,44 @@
             } finally {
                 window.ui.hideLoading();
             }
+        }
+
+        // Helper function to get product image URL
+        function getProductImageUrl(product) {
+            if (product.main_image) {
+                return buildImageUrl(product.main_image);
+            }
+            if (product.image) {
+                return buildImageUrl(product.image);
+            }
+            if (product.images && product.images.length > 0) {
+                const firstImage = product.images[0];
+                if (typeof firstImage === 'string') {
+                    return buildImageUrl(firstImage);
+                }
+                if (firstImage.image) {
+                    return buildImageUrl(firstImage.image);
+                }
+            }
+            return null;
+        }
+
+        function buildImageUrl(imagePath) {
+            if (!imagePath) return null;
+            
+            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                return imagePath;
+            }
+            
+            if (imagePath.startsWith('/media/')) {
+                return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}${imagePath}`;
+            }
+            
+            if (!imagePath.startsWith('/')) {
+                return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}/media/${imagePath}`;
+            }
+            
+            return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}${imagePath}`;
         }
 
         // Initialize checkout when page loads

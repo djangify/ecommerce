@@ -14,7 +14,6 @@ class ProductManager {
 
     console.log('Loading products with filters:', filters);
 
-
     try {
       this.isLoading = true;
       window.ui.showLoading();
@@ -26,7 +25,6 @@ class ProductManager {
       console.log('Products received:', products);
       if (products.length > 0) {
         console.log('First product structure:', products[0]);
-        console.log('First product:', products[0]);
         console.log('Product ID field:', products[0].id);
         console.log('Product keys:', Object.keys(products[0]));
       }
@@ -117,23 +115,30 @@ class ProductManager {
       descriptionElement.textContent = tempDiv.textContent || tempDiv.innerText || 'No description available';
     }
 
-    // Update main image - use placeholder instead of loading images
+    // Update main image
     const mainImage = document.getElementById('main-image');
     if (mainImage) {
-      // Don't load actual images - use text placeholder
-      mainImage.style.display = 'none';
+      const imageUrl = this.getProductMainImage(product);
 
-      // Find or create main image placeholder
-      let placeholder = document.querySelector('.main-image-placeholder');
-      if (!placeholder) {
-        placeholder = document.createElement('div');
-        placeholder.className = 'main-image-placeholder w-full h-full flex flex-col items-center justify-center text-center bg-slate-100 border-2 border-dashed border-slate-300 rounded-lg';
-        placeholder.innerHTML = `
-          <div class="text-slate-700 font-semibold text-lg mb-2">${product.name}</div>
-          <div class="text-slate-500 text-sm">Main Product Image</div>
-          <div class="text-slate-400 text-xs mt-2">Images temporarily disabled</div>
-        `;
-        mainImage.parentNode.insertBefore(placeholder, mainImage);
+      if (imageUrl) {
+        mainImage.src = imageUrl;
+        mainImage.alt = product.name;
+        mainImage.style.display = 'block';
+
+        // Add error handling
+        mainImage.onerror = () => {
+          mainImage.style.display = 'none';
+          this.showImagePlaceholder(mainImage.parentNode, product.name, 'Main Product Image');
+        };
+
+        // Remove any existing placeholder
+        const existingPlaceholder = document.querySelector('.main-image-placeholder');
+        if (existingPlaceholder) {
+          existingPlaceholder.remove();
+        }
+      } else {
+        mainImage.style.display = 'none';
+        this.showImagePlaceholder(mainImage.parentNode, product.name, 'Main Product Image');
       }
     }
 
@@ -188,16 +193,34 @@ class ProductManager {
     const thumbnailContainer = document.querySelector('.grid.grid-cols-4.gap-4');
     if (!thumbnailContainer) return;
 
-    // Create text-based placeholder thumbnails - NO IMAGES
+    // Create thumbnail images
     const thumbnailCount = Math.min(images.length || 4, 4); // Max 4 thumbnails
-    thumbnailContainer.innerHTML = Array.from({ length: thumbnailCount }, (_, index) => `
-      <button class="aspect-square bg-slate-100 rounded-lg border-2 border-dashed border-slate-300 ${index === 0 ? 'border-teal-600' : 'hover:border-slate-400'}" onclick="window.productManager.selectThumbnail(${index})">
-        <div class="w-full h-full flex flex-col items-center justify-center text-center p-2">
-          <div class="text-slate-600 text-xs font-medium">Image ${index + 1}</div>
-          <div class="text-slate-400 text-xs mt-1">Thumbnail</div>
-        </div>
-      </button>
-    `).join('');
+    thumbnailContainer.innerHTML = Array.from({ length: thumbnailCount }, (_, index) => {
+      const image = images[index];
+      const imageUrl = this.getThumbnailImageUrl(image);
+
+      return `
+        <button class="aspect-square bg-slate-100 rounded-lg border-2 border-dashed border-slate-300 ${index === 0 ? 'border-teal-600' : 'hover:border-slate-400'} overflow-hidden" onclick="window.productManager.selectThumbnail(${index})">
+          ${imageUrl ? `
+            <img 
+              src="${imageUrl}" 
+              alt="Product thumbnail ${index + 1}"
+              class="w-full h-full object-cover"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            >
+            <div class="w-full h-full flex flex-col items-center justify-center text-center p-2" style="display: none;">
+              <div class="text-slate-600 text-xs font-medium">Image ${index + 1}</div>
+              <div class="text-slate-400 text-xs mt-1">Not available</div>
+            </div>
+          ` : `
+            <div class="w-full h-full flex flex-col items-center justify-center text-center p-2">
+              <div class="text-slate-600 text-xs font-medium">Image ${index + 1}</div>
+              <div class="text-slate-400 text-xs mt-1">Thumbnail</div>
+            </div>
+          `}
+        </button>
+      `;
+    }).join('');
   }
 
   updateBreadcrumb(categoryName, productName) {
@@ -274,7 +297,6 @@ class ProductManager {
     }
   }
 
-  // In products.js, in the getActiveFilters() function, update the sort filter section
   getActiveFilters() {
     const filters = {};
 
@@ -323,6 +345,7 @@ class ProductManager {
     console.log('Active filters being sent:', filters);
     return filters;
   }
+
   // Product detail page specific methods
   selectThumbnail(index) {
     // Update thumbnail selection without loading images
@@ -338,8 +361,23 @@ class ProductManager {
   }
 
   changeMainImage(imageSrc) {
-    // Keep this method for backward compatibility but don't load images
-    console.log('Image switching disabled - using placeholder');
+    const mainImage = document.getElementById('main-image');
+    if (mainImage && imageSrc) {
+      mainImage.src = imageSrc;
+      mainImage.style.display = 'block';
+
+      // Remove placeholder if it exists
+      const placeholder = document.querySelector('.main-image-placeholder');
+      if (placeholder) {
+        placeholder.remove();
+      }
+
+      // Add error handling
+      mainImage.onerror = () => {
+        mainImage.style.display = 'none';
+        this.showImagePlaceholder(mainImage.parentNode, 'Product', 'Image not available');
+      };
+    }
   }
 
   updateQuantity(delta) {
@@ -354,7 +392,7 @@ class ProductManager {
   addToCartWithQuantity() {
     const quantity = document.getElementById('quantity')?.value || 1;
 
-    // Use the stored product data to get the correct product ID
+    // Use the stored product data to get the correct product ID (integer)
     if (this.currentProduct && this.currentProduct.id) {
       window.cartManager.addToCart(this.currentProduct.id, parseInt(quantity));
     } else {
@@ -371,6 +409,98 @@ class ProductManager {
   // Keep the old method name for backward compatibility
   getProductIdFromURL() {
     return this.getProductSlugFromURL();
+  }
+
+  // Image handling helper methods
+  getProductMainImage(product) {
+    // Try different possible image fields - YOUR DJANGO MODEL USES main_image
+    if (product.main_image) {
+      return this.buildImageUrl(product.main_image);
+    }
+
+    if (product.image) {
+      return this.buildImageUrl(product.image);
+    }
+
+    if (product.featured_image) {
+      return this.buildImageUrl(product.featured_image);
+    }
+
+    if (product.images && product.images.length > 0) {
+      const firstImage = product.images[0];
+      if (typeof firstImage === 'string') {
+        return this.buildImageUrl(firstImage);
+      }
+      if (firstImage.image) {
+        return this.buildImageUrl(firstImage.image);
+      }
+      if (firstImage.url) {
+        return this.buildImageUrl(firstImage.url);
+      }
+    }
+
+    return null;
+  }
+
+  getThumbnailImageUrl(image) {
+    if (!image) return null;
+
+    if (typeof image === 'string') {
+      return this.buildImageUrl(image);
+    }
+
+    if (image.thumbnail) {
+      return this.buildImageUrl(image.thumbnail);
+    }
+
+    if (image.image) {
+      return this.buildImageUrl(image.image);
+    }
+
+    if (image.url) {
+      return this.buildImageUrl(image.url);
+    }
+
+    return null;
+  }
+
+  buildImageUrl(imagePath) {
+    if (!imagePath) return null;
+
+    // If it's already a complete URL, return as-is
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+
+    // If it starts with /media/, build complete URL
+    if (imagePath.startsWith('/media/')) {
+      return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}${imagePath}`;
+    }
+
+    // If it doesn't start with /, add /media/ prefix
+    if (!imagePath.startsWith('/')) {
+      return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}/media/${imagePath}`;
+    }
+
+    // Default case
+    return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}${imagePath}`;
+  }
+
+  showImagePlaceholder(container, productName, imageType) {
+    // Remove any existing placeholder
+    const existingPlaceholder = container.querySelector('.main-image-placeholder');
+    if (existingPlaceholder) {
+      existingPlaceholder.remove();
+    }
+
+    const placeholder = document.createElement('div');
+    placeholder.className = 'main-image-placeholder w-full h-full flex flex-col items-center justify-center text-center bg-slate-100 border-2 border-dashed border-slate-300 rounded-lg';
+    placeholder.innerHTML = `
+      <div class="text-slate-700 font-semibold text-lg mb-2">${productName}</div>
+      <div class="text-slate-500 text-sm">${imageType}</div>
+      <div class="text-slate-400 text-xs mt-2">Image not available</div>
+    `;
+    container.appendChild(placeholder);
   }
 }
 

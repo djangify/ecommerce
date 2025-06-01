@@ -47,7 +47,7 @@
                             placeholder="Search products..."
                             class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent"
                         >
-                        <button class="absolute right-2 top-2 text-slate-400 hover:text-slate-600">
+                        <button class="absolute right-2 top-2 text-slate-400 hover:text-slate-600" aria-label="Search button">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
@@ -111,6 +111,18 @@
             
             <!-- Cart Items (Left Side) -->
             <div class="lg:col-span-2">
+                <!-- Cart Controls -->
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-slate-900">Cart Items</h2>
+                    <button 
+                        onclick="clearEntireCart()"
+                        class="text-sm text-slate-600 hover:text-red-600 font-medium"
+                        id="clear-cart-btn"
+                    >
+                        Clear Cart
+                    </button>
+                </div>
+
                 <div id="cart-items" class="space-y-6">
                     <!-- Cart items will be loaded here -->
                 </div>
@@ -134,13 +146,24 @@
                 <div class="bg-slate-50 rounded-lg p-6 sticky top-24">
                     <h2 class="text-xl font-semibold text-slate-900 mb-6">Order Summary</h2>
                     
+                    <!-- Cart Type Indicator -->
+                    <div id="cart-type-indicator" class="mb-4 p-3 rounded-lg border" style="display: none;">
+                        <div class="flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                            </svg>
+                            <span class="text-sm font-medium" id="cart-type-text">Digital Downloads Only</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1" id="cart-type-description">No shipping required</p>
+                    </div>
+                    
                     <!-- Summary Details -->
                     <div class="space-y-4 mb-6">
                         <div class="flex justify-between">
                             <span class="text-slate-600">Subtotal (<span id="summary-item-count">0</span> items)</span>
                             <span class="font-medium text-slate-900" id="summary-subtotal">$0.00</span>
                         </div>
-                        <div class="flex justify-between">
+                        <div class="flex justify-between" id="shipping-row">
                             <span class="text-slate-600">Shipping</span>
                             <span class="font-medium text-slate-900" id="summary-shipping">$5.99</span>
                         </div>
@@ -265,9 +288,9 @@
                     <h3 class="font-semibold mb-4">Quick Links</h3>
                     <ul class="space-y-2 text-sm">
                         <li><a href="index.html" class="text-slate-400 hover:text-white">Shop</a></li>
-                        <li><a href="about.html" class="text-slate-400 hover:text-white">About Us</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white">About Us</a></li>
                         <li><a href="contact.html" class="text-slate-400 hover:text-white">Contact</a></li>
-                        <li><a href="shipping.html" class="text-slate-400 hover:text-white">Shipping</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white">Shipping</a></li>
                     </ul>
                 </div>
 
@@ -294,6 +317,7 @@
                         >
                         <button 
                             type="submit"
+                            aria-label="submit details for newsletter"
                             class="bg-teal-600 hover:bg-teal-700 px-4 py-2 rounded-r-md transition-colors"
                         >
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -332,7 +356,6 @@
     </footer>
 
     <!-- Custom JavaScript -->
-    <script src="js/contact.js"></script>
     <script src="js/config.js"></script>
     <script src="js/api.js"></script>
     <script src="js/main.js"></script>
@@ -341,6 +364,9 @@
     <script src="js/products.js"></script>
     
     <script>
+        // Cart-specific variables
+        let currentCartData = null;
+
         // Cart-specific functions
         async function removeCartItem(itemId) {
             await window.cartManager.removeFromCart(itemId);
@@ -359,13 +385,13 @@
         }
 
         async function updateItemQuantityDirect(itemId, quantity) {
-            await window.cartManager.updateCartItem(itemId, quantity);
+            await window.cartManager.updateCartItem(itemId, parseInt(quantity));
             await loadCartPage();
         }
 
         async function moveToWishlist(itemId) {
             try {
-                const item = window.cartManager.cartData.items.find(item => item.id === itemId);
+                const item = currentCartData.items.find(item => item.id === itemId);
                 if (item) {
                     await window.cartManager.toggleWishlist(item.product.id);
                     await removeCartItem(itemId);
@@ -373,6 +399,18 @@
             } catch (error) {
                 console.error('Error moving to wishlist:', error);
                 window.ui.showMessage('Failed to move item to wishlist', 'error');
+            }
+        }
+
+        async function clearEntireCart() {
+            if (!currentCartData || !currentCartData.items || currentCartData.items.length === 0) {
+                window.ui.showMessage('Cart is already empty', 'info');
+                return;
+            }
+
+            if (confirm('Are you sure you want to clear all items from your cart?')) {
+                await window.cartManager.clearCart();
+                await loadCartPage();
             }
         }
 
@@ -390,7 +428,13 @@
         }
 
         function proceedToCheckout() {
-            window.location.href = 'checkout.html';
+            // Pass cart token to checkout
+            const cartToken = window.cartManager.getCartToken();
+            if (cartToken) {
+                window.location.href = `checkout.html?cart_token=${cartToken}`;
+            } else {
+                window.location.href = 'checkout.html';
+            }
         }
 
         async function loadCartPage() {
@@ -403,6 +447,7 @@
 
                 const cart = await window.api.getCart();
                 console.log('Cart data loaded:', cart);
+                currentCartData = cart;
 
                 if (!cart.items || cart.items.length === 0) {
                     showEmptyCart();
@@ -411,6 +456,7 @@
 
                 displayCartItems(cart.items);
                 updateCartSummary(cart);
+                updateCartTypeIndicator(cart);
                 
                 document.getElementById('cart-loading').style.display = 'none';
                 document.getElementById('cart-container').style.display = 'grid';
@@ -439,15 +485,33 @@
             const product = item.product;
             const variant = item.variant;
             
+            // Get product image
+            const imageUrl = getProductImageUrl(product);
+            
             return `
                 <div class="cart-item bg-white border border-slate-200 rounded-lg p-6" data-item-id="${item.id}">
                     <div class="flex flex-col sm:flex-row gap-6">
-                        <!-- Product Image Placeholder -->
-                        <div class="w-full sm:w-32 h-32 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0 border-2 border-dashed border-slate-300">
-                            <div class="w-full h-full flex flex-col items-center justify-center text-center p-2">
-                                <div class="text-slate-700 font-semibold text-sm mb-1">${product.name}</div>
-                                <div class="text-xs text-slate-500">${product.category?.name || 'Product'}</div>
-                            </div>
+                        <!-- Product Image -->
+                        <div class="w-full sm:w-32 h-32 bg-slate-100 rounded-lg overflow-hidden flex-shrink-0">
+                            ${imageUrl ? `
+                                <img 
+                                    src="${imageUrl}" 
+                                    alt="${product.name}"
+                                    class="w-full h-full object-cover"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+                                >
+                                <div class="w-full h-full flex flex-col items-center justify-center text-center p-2 border-2 border-dashed border-slate-300" style="display: none;">
+                                    <div class="text-slate-700 font-semibold text-sm mb-1">${product.name}</div>
+                                    <div class="text-xs text-slate-500">${product.category?.name || 'Product'}</div>
+                                    <div class="text-xs text-slate-400 mt-1">Image not available</div>
+                                </div>
+                            ` : `
+                                <div class="w-full h-full flex flex-col items-center justify-center text-center p-2 border-2 border-dashed border-slate-300">
+                                    <div class="text-slate-700 font-semibold text-sm mb-1">${product.name}</div>
+                                    <div class="text-xs text-slate-500">${product.category?.name || 'Product'}</div>
+                                    <div class="text-xs text-slate-400 mt-1">No image available</div>
+                                </div>
+                            `}
                         </div>
                         
                         <!-- Product Details -->
@@ -455,10 +519,18 @@
                             <div class="flex justify-between items-start">
                                 <div>
                                     <h3 class="text-lg font-semibold text-slate-900 mb-1">
-                                        <a href="product.html?id=${product.slug}" class="hover:text-teal-600">${product.name}</a>
+                                        <a href="product.html?slug=${product.slug}" class="hover:text-teal-600">${product.name}</a>
                                     </h3>
                                     ${variant ? `<p class="text-sm text-slate-600">${variant.name || 'Variant'}</p>` : ''}
-                                    <p class="text-sm text-slate-500">SKU: ${product.sku}</p>
+                                    <p class="text-sm text-slate-500">SKU: ${product.sku || 'N/A'}</p>
+                                    ${product.product_type === 'digital' ? `
+                                        <div class="flex items-center gap-1 mt-1">
+                                            <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                                            </svg>
+                                            <span class="text-xs text-blue-600 font-medium">Digital Download</span>
+                                        </div>
+                                    ` : ''}
                                 </div>
                                 <button 
                                     class="text-slate-400 hover:text-red-600 p-1"
@@ -528,29 +600,92 @@
         }
 
         function updateCartSummary(cart) {
-            // Calculate totals
-            const itemCount = cart.total_items || 0;
-            const subtotal = parseFloat(cart.subtotal || 0);
-            const shipping = subtotal > 50 ? 0 : 5.99; // Free shipping over $50
-            const tax = subtotal * 0.1; // 10% tax
-            const discount = 0; // No discount applied yet
-            const total = subtotal + shipping + tax - discount;
+            // Use cart manager's calculation logic
+            const totals = window.cartManager.calculateTotals(cart);
 
             // Update summary elements
-            document.getElementById('summary-item-count').textContent = itemCount;
-            document.getElementById('summary-subtotal').textContent = `$${subtotal.toFixed(2)}`;
-            document.getElementById('summary-shipping').textContent = shipping === 0 ? 'FREE' : `$${shipping.toFixed(2)}`;
-            document.getElementById('summary-tax').textContent = `$${tax.toFixed(2)}`;
-            document.getElementById('summary-total').textContent = `$${total.toFixed(2)}`;
+            document.getElementById('summary-item-count').textContent = totals.itemCount;
+            document.getElementById('summary-subtotal').textContent = `$${totals.subtotal}`;
+            document.getElementById('summary-tax').textContent = `$${totals.tax}`;
+            document.getElementById('summary-total').textContent = `$${totals.total}`;
+
+            // Handle shipping display
+            const shippingRow = document.getElementById('shipping-row');
+            const shippingElement = document.getElementById('summary-shipping');
+            
+            if (cart.requires_shipping) {
+                shippingRow.style.display = 'flex';
+                shippingElement.textContent = totals.shipping === 'FREE' ? 'FREE' : `$${totals.shipping}`;
+            } else {
+                shippingRow.style.display = 'none';
+            }
 
             // Enable/disable checkout button
             const checkoutBtn = document.getElementById('checkout-btn');
-            checkoutBtn.disabled = itemCount === 0;
-            if (itemCount === 0) {
+            checkoutBtn.disabled = totals.itemCount === 0;
+            if (totals.itemCount === 0) {
                 checkoutBtn.classList.add('opacity-50', 'cursor-not-allowed');
             } else {
                 checkoutBtn.classList.remove('opacity-50', 'cursor-not-allowed');
             }
+        }
+
+        function updateCartTypeIndicator(cart) {
+            const indicator = document.getElementById('cart-type-indicator');
+            const typeText = document.getElementById('cart-type-text');
+            const typeDescription = document.getElementById('cart-type-description');
+
+            if (cart.is_digital_only) {
+                indicator.style.display = 'block';
+                indicator.className = 'mb-4 p-3 rounded-lg border border-blue-200 bg-blue-50';
+                typeText.textContent = 'Digital Downloads Only';
+                typeDescription.textContent = 'No shipping required - instant access after payment';
+            } else if (cart.has_digital_items && cart.has_physical_items) {
+                indicator.style.display = 'block';
+                indicator.className = 'mb-4 p-3 rounded-lg border border-purple-200 bg-purple-50';
+                typeText.textContent = 'Mixed Cart';
+                typeDescription.textContent = 'Contains both physical and digital items';
+            } else {
+                indicator.style.display = 'none';
+            }
+        }
+
+        // Helper function to get product image URL
+        function getProductImageUrl(product) {
+            if (product.main_image) {
+                return buildImageUrl(product.main_image);
+            }
+            if (product.image) {
+                return buildImageUrl(product.image);
+            }
+            if (product.images && product.images.length > 0) {
+                const firstImage = product.images[0];
+                if (typeof firstImage === 'string') {
+                    return buildImageUrl(firstImage);
+                }
+                if (firstImage.image) {
+                    return buildImageUrl(firstImage.image);
+                }
+            }
+            return null;
+        }
+
+        function buildImageUrl(imagePath) {
+            if (!imagePath) return null;
+            
+            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                return imagePath;
+            }
+            
+            if (imagePath.startsWith('/media/')) {
+                return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}${imagePath}`;
+            }
+            
+            if (!imagePath.startsWith('/')) {
+                return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}/media/${imagePath}`;
+            }
+            
+            return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}${imagePath}`;
         }
 
         // Load cart when page loads

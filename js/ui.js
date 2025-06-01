@@ -103,30 +103,46 @@ class UIManager {
   }
 
   createProductHTML(product) {
-    // COMPLETELY REMOVED IMAGE LOADING - NO IMAGES AT ALL
     const salePrice = product.sale_price;
     const regularPrice = product.price;
     const isOnSale = salePrice && salePrice < regularPrice;
 
-    // Ensure we have a valid product ID
-    const productId = product.id || product.pk;  // Some APIs use 'pk' instead of 'id'
+    // Product ID is now always an integer
+    const productId = parseInt(product.id);
     const productSlug = product.slug;
 
-    if (!productId) {
-      console.error('Product missing ID:', product);
+    if (!productId || isNaN(productId)) {
+      console.error('Product missing valid integer ID:', product);
+      return '';
     }
+
+    // Get product image
+    const imageUrl = this.getProductImageUrl(product);
+    const imageAlt = product.name || 'Product Image';
 
     return `
       <div class="group product-item" data-product-id="${productId}" data-product-slug="${productSlug}">
-        <div class="aspect-square bg-slate-100 rounded-lg mb-4 relative border-2 border-dashed border-slate-300">
-          <!-- NO IMAGES - JUST PRODUCT INFO -->
-          <div class="w-full h-full flex flex-col items-center justify-center text-center p-4">
-            <div class="text-slate-700 font-semibold mb-2">${product.name || 'Product'}</div>
-            <div class="text-sm text-slate-500">${product.category?.name || 'Uncategorized'}</div>
-            <div class="text-lg font-bold text-slate-900 mt-2">
-              ${isOnSale ? `$${salePrice}` : `$${regularPrice}`}
+        <div class="aspect-square bg-slate-100 rounded-lg mb-4 relative overflow-hidden">
+          ${imageUrl ? `
+            <img 
+              src="${imageUrl}" 
+              alt="${imageAlt}"
+              class="w-full h-full object-cover product-image"
+              loading="lazy"
+              onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';"
+            >
+            <div class="w-full h-full flex flex-col items-center justify-center text-center p-4 border-2 border-dashed border-slate-300" style="display: none;">
+              <div class="text-slate-700 font-semibold mb-2">${product.name || 'Product'}</div>
+              <div class="text-sm text-slate-500">${product.category?.name || 'Uncategorized'}</div>
+              <div class="text-xs text-slate-400 mt-2">Image not available</div>
             </div>
-          </div>
+          ` : `
+            <div class="w-full h-full flex flex-col items-center justify-center text-center p-4 border-2 border-dashed border-slate-300">
+              <div class="text-slate-700 font-semibold mb-2">${product.name || 'Product'}</div>
+              <div class="text-sm text-slate-500">${product.category?.name || 'Uncategorized'}</div>
+              <div class="text-xs text-slate-400 mt-2">No image available</div>
+            </div>
+          `}
           
           <div class="absolute top-3 right-3">
             <button 
@@ -164,6 +180,61 @@ class UIManager {
         
       </div>
     `;
+  }
+
+  // Get product image URL with proper fallback
+  getProductImageUrl(product) {
+    // Try different possible image fields - YOUR DJANGO MODEL USES main_image
+    if (product.main_image) {
+      return this.buildImageUrl(product.main_image);
+    }
+
+    if (product.image) {
+      return this.buildImageUrl(product.image);
+    }
+
+    if (product.featured_image) {
+      return this.buildImageUrl(product.featured_image);
+    }
+
+    if (product.images && product.images.length > 0) {
+      const firstImage = product.images[0];
+      if (typeof firstImage === 'string') {
+        return this.buildImageUrl(firstImage);
+      }
+      if (firstImage.image) {
+        return this.buildImageUrl(firstImage.image);
+      }
+      if (firstImage.url) {
+        return this.buildImageUrl(firstImage.url);
+      }
+    }
+
+    // No image found
+    return null;
+  }
+
+  // Build complete image URL
+  buildImageUrl(imagePath) {
+    if (!imagePath) return null;
+
+    // If it's already a complete URL, return as-is
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+
+    // If it starts with /media/, build complete URL
+    if (imagePath.startsWith('/media/')) {
+      return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}${imagePath}`;
+    }
+
+    // If it doesn't start with /, add /media/ prefix
+    if (!imagePath.startsWith('/')) {
+      return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}/media/${imagePath}`;
+    }
+
+    // Default case
+    return `${window.CONFIG.apiBaseUrl.replace('/api/v1', '')}${imagePath}`;
   }
 
   // Category display
