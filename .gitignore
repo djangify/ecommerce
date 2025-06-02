@@ -1,20 +1,26 @@
-# Dependencies  
-node_modules/
-package-lock.json
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
 
-# Build output
-dist/
-.astro/
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
 
 # Environment variables
 .env
 .env.local
-.env.*.local
 
-# Logs
-*.log
-npm-debug.log*
-
-# OS
-.DS_Store
-Thumbs.db
+# Any build tools you might add later
+node_modules/
+dist/

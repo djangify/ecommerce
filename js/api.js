@@ -34,7 +34,7 @@ class APIClient {
     };
 
     // Add cart token to headers if available (for cart operations)
-    if (this.cartToken && url.includes('/cart')) {
+    if (this.cartToken && (url.includes('/cart') || url.includes('/items/'))) {
       defaultOptions.headers['Authorization'] = `Bearer ${this.cartToken}`;
     }
 
